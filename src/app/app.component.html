@@ -54,16 +54,19 @@
           <p>You must choose six numbers and one lucky number.</p>
           <div class="lottery-number-container">
             <div *ngFor="let lotteryNumber of lotteryNumbers; let i=index">
-              <div class="number-box" id="lottery-number-{{i}}">
-                <div class="number">{{lotteryNumbers[i]}}</div>
+              <div [class.number-box-active]="chosenNumbers.includes(lotteryNumber)"
+                   (click)="mutateLotteryNumber(lotteryNumber)" class="number-box" id="lottery-number-{{i}}">
+                <div class="number">{{lotteryNumber}}</div>
               </div>
             </div>
           </div>
           <hr class="lucky-number-rule">
           <div class="lucky-number-container">
             <div *ngFor="let luckyNumber of luckyNumbers; let i=index">
-              <div class="number-box lucky-number-box" id="lucky-number-{{i}}">
-                <div class="number">{{luckyNumbers[i]}}</div>
+              <div [class.lucky-number-box-active]="chosenLuckyNumber === luckyNumber"
+                   (click)="mutateLuckyNumber(luckyNumber)"
+                   class="number-box lucky-number-box" id="lucky-number-{{i}}">
+                <div class="number">{{luckyNumber}}</div>
               </div>
             </div>
           </div>

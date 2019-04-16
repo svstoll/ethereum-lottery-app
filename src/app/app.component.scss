@@ -63,12 +63,20 @@
   background-color: gold;
 }
 
+.number-box-active {
+  background-color: gold;
+}
+
 .lucky-number-box {
   border-radius: 50%;
   background-color: gold;
 }
 
 .lucky-number-box:hover {
+  background-color: $color-secondary;
+}
+
+.lucky-number-box-active {
   background-color: $color-secondary;
 }
 

@@ -23,9 +23,21 @@ export class AppComponent implements OnInit {
     for (let i = 0; i < 6; i++) {
       this.luckyNumbers[i] = i + 1;
     }
+    // this.getBalance();
   }
 
-  public getBalance() {
+  public getBalance(): void {
     this.donationService.getBalance().then(() => console.log('Balance call finished.'));
+  }
+
+  public mutateLotteryNumber(lotteryNumber: number): void {
+    (this.chosenNumbers.includes(lotteryNumber)) ?
+      this.chosenNumbers = this.chosenNumbers.filter((n) => n !== lotteryNumber) :
+      (this.chosenNumbers.length < 6) && this.chosenNumbers.push(lotteryNumber);
+    console.log(this.chosenNumbers);
+  }
+
+  public mutateLuckyNumber(luckyNumber: number): void {
+    this.chosenLuckyNumber = luckyNumber;
   }
 }
