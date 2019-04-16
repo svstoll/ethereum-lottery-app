@@ -72,7 +72,7 @@
           </div>
           <hr class="lucky-number-rule">
           <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-primary button-not-last">
+            <button (click)="randomPick()" type="button" class="btn btn-primary button-not-last">
               Random <i class="fas fa-dice"></i>
             </button>
             <button type="button" class="btn btn-primary" (click)="getBalance()">

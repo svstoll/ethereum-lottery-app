@@ -40,4 +40,15 @@ export class AppComponent implements OnInit {
   public mutateLuckyNumber(luckyNumber: number): void {
     this.chosenLuckyNumber = luckyNumber;
   }
+
+  public randomPick(): void {
+    this.chosenNumbers = [];
+    while (this.chosenNumbers.length !== 6) {
+      const numToAdd = Math.ceil(Math.random() * 42);
+      if (!this.chosenNumbers.includes(numToAdd)) {
+        this.chosenNumbers.push(numToAdd);
+      }
+    }
+    this.chosenLuckyNumber = Math.ceil(Math.random() * 6);
+  }
 }
