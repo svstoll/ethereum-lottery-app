@@ -1,9 +1,17 @@
 /* feel free to do any changes!
     here are few things need to be updated:
-    1.  payment function. Should we(manager) send enough money to the contract in advance? 
+    1.  payment function. Should we(manager) send enough money to the contract in advance?
         I don't know what will happen if there is no enough balance.
     2.  how to start next round automatically?
     3.  Unfortunately, mapping cannot be cleared in solidity. So after the end, how can we clear all data?
+*/
+/* Update Roger:
+    1. Introduced rounds: The lottery is able to manage rounds now. After a lottery "cycle" has finished another round starts automatically
+        I did it with a mappig from rounds to betting numbers to ticketholders
+    2. Automatic Payout after starting the lottery through the manager: When the manager starts the lottery, a random number gets
+        drawn, the winners are assigned and the pricepool is paid out.
+    3. The pricepool is acummulated with the price the players pay for a ticket. If somebody wins, the pricepool is paid out and set to 0.
+    
 */
 pragma solidity >=0.5.0;
 
@@ -40,32 +48,30 @@ contract OracleAda{
 
 /* Lottery Rule: pick 4 unique numbers from 0 - 9
     random number is generated exteranlly and logged into conrtact.
-    The ticket with all numbers match the random number wins (no order). 
+    The ticket with all numbers match the random number wins (no order).
     Divide the prize money, if there are more than 1 winner.
 */
 contract LotteryAda is OracleAda{
     uint private price;
-    uint public prizepool;
-    uint private prize;
-    uint public EndTime;
-    uint16 private randomNum;
-    uint round;
-    
-    address payable[] public winners; 
+    uint private pricePool;
+    uint private round;
+
     address manager; // set the manager address to our account address when everything is done.
-   
+
     struct Bet{
         uint16 betNum;
-        uint timestamp;
+        uint round;
         address ticketOwner;
     }
-    
+
     mapping (address =>Bet[]) public tickets;
-    mapping (uint24 => address payable[]) ticketholders;
-    
+    mapping (uint => mapping(uint24 => address payable[])) ticketholdersInRounds;
+    mapping (uint => address payable[]) private winnersInRounds;
+    mapping (uint => uint16) randomNumbersInRounds;
+
 
     event result(address payable[] winners, uint prizepool);
-   
+
     modifier cost(){
         require(
             // ######## unit of money. 1 = 1e18    ##########
@@ -74,15 +80,7 @@ contract LotteryAda is OracleAda{
             );
         _;
     }
-    // I set a limit for the number of tickets a player can buy in one round. Can be deleted.
-    modifier TicketLimit(){
-        require(
-            tickets[msg.sender].length<10,
-            "Exceeding maximum number of tickets"
-        );
-        _;
-    }
-    
+
     // manager call the end and draw randomNum.
     modifier onlyManager(){
         require(msg.sender == manager);
@@ -97,66 +95,74 @@ contract LotteryAda is OracleAda{
                 "Follow the required order of input");
                 _;
     }
-    modifier beforeEnd(){
-        require(
-            now< EndTime,
-            "Current round is close.");
-            _;
-    }
-    modifier afterEnd(){
-        require(
-            now >= EndTime,
-            "Too early to call the end");
-        _;
-    }
-    
-    constructor(uint _Endtime, uint _price, uint _prizepool) public payable {
-        EndTime = now+2 days;
-        price = _price;
-        prizepool = _prizepool;
-        manager = msg.sender;
-    }
-    
-    function setBet(uint16 _betNum) cost TicketLimit beforeEnd decreasingOrder(_betNum) public payable{
 
-        Bet memory _bet = Bet({betNum:_betNum, timestamp:uint(now), ticketOwner:msg.sender});
+    constructor(uint _price) public payable {
+        price = _price;
+        manager = msg.sender;
+        pricePool = 0;
+        round = 1;
+    }
+
+    function setBet(uint16 _betNum) cost decreasingOrder(_betNum) public payable{
+
+        Bet memory _bet = Bet({betNum:_betNum, round: round, ticketOwner:msg.sender});
         tickets[msg.sender].push(_bet);
-       
-       
-        /* player is not unique in the array "ticketholders", 
+
+
+        /* player is not unique in the array "ticketholders",
             i think to check if msg.sender exists is expensive as well
             so I just leave it here. I hope you have better ideas.
-            
+
             But I think it is OK.
-            The logic is: We have 2 winner, A has 2 winning bets, B has 1 wining bet. 
+            The logic is: We have 2 winner, A has 2 winning bets, B has 1 wining bet.
             Then A gets 2/3 of prizepool, B gets 1/3.
         */
-        ticketholders[_betNum].push(msg.sender);
+        // Use this mapping to get easily the tickets to payout the winners
+        ticketholdersInRounds[round][_betNum].push(msg.sender);
+        // update prizepool
+        pricePool += msg.value;
     }
-    
-    
+
+    function startLottery() onlyManager public payable {
+        setRandomNumber();
+        setWinners();
+        pay();
+        // go to the next round
+        round++;
+    }
+
+
     // get random number
-    function generateRandom() onlyManager afterEnd private{
+    function setRandomNumber() onlyManager private{
         // query function in Oracle
+        /*
+        I don't get how the oracle works so i just take a fixed number for testing
+
         randomquery();
-        randomNum = getRandom();
-        
-    }
-  
-    function win() afterEnd onlyManager private {
-        winners = ticketholders[randomNum];
-        emit result(winners,prizepool);
-        
-    }
-    
-    // pay prize to each winner
-    function pay() afterEnd onlyManager public payable{
-        prize = prizepool/winners.length;
-        for(uint i=0;i<winners.length;i++){
-            winners[i].transfer(prize);
-        }
+        randomNumbers[round] = getRandom();
+        */
+        randomNumbersInRounds[round] = 6543;
 
     }
-    
+
+    function setWinners() onlyManager private {
+        winnersInRounds[round] = ticketholdersInRounds[round][randomNumbersInRounds[round]];
+    }
+
+    function getWinners() public view returns (address payable[] memory) {
+        return winnersInRounds[round - 1];
+    }
+
+    // pay prize to each winner
+    function pay() onlyManager private {
+        if(winnersInRounds[round].length != 0) {
+            uint priceToWinner = pricePool/winnersInRounds[round].length;
+            for(uint i=0;i<winnersInRounds[round].length;i++){
+                winnersInRounds[round][i].transfer(priceToWinner);
+            }
+            pricePool = 0;
+        }
+    }
+
 
 }
