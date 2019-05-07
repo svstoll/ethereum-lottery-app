@@ -1,58 +1,75 @@
-import { Injectable } from '@angular/core';
-
-declare var Web3: any;
-declare var ethereum: any;
+import {Inject, Injectable, OnInit} from '@angular/core';
+import { WEB3 } from './web3';
+import Web3 from 'web3';
 
 @Injectable()
 export class MetaMaskService {
-  private helloWorldContractAbi: any = [
+
+  abi: any = [
     {
-      inputs: [],
-      payable: false,
-      stateMutability: 'nonpayable',
-      type: 'constructor',
-      signature: 'constructor'
-    },
-    {
-      constant: true,
-      inputs: [],
-      name: 'hi',
-      outputs: [
+      "constant": true,
+      "inputs": [],
+      "name": "message",
+      "outputs": [
         {
-          name: '',
-          type: 'string'
+          "name": "",
+          "type": "string"
         }
       ],
-      payable: false,
-      stateMutability: 'pure',
-      type: 'function',
-      signature: '0xa99dca3f'
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xe21f37ce"
+    },
+    {
+      "inputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor",
+      "signature": "constructor"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "GetMessage",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x03e33b53"
     }
   ];
 
-  public init() {}
 
-  public async getBalance() {
-    try {
-      await ethereum.enable();
-      const web3 = new Web3(ethereum);
+  constructor(@Inject(WEB3) private web3: Web3) {
 
-      await web3.eth.getBalance(web3.eth.accounts[0], (error: any, balance: any) => {
-        if (error) {
-          console.log(error);
-        }
-        const ether = web3.fromWei(balance, 'ether');
-        console.log(ether.toString());
-      });
+  }
 
-      const helloContract: any = web3.eth.contract(this.helloWorldContractAbi);
-      const contract: any = helloContract.at('0xd3e8a6d8b90c1d1cb82374935691cc9d5054aa9f');
-
-      await contract.hi((error, value) => {
-        console.log(value);
-      });
-    } catch (error) {
-      console.log(error);
+  init() {
+    if ('enable' in this.web3.currentProvider) {
+      this.web3.currentProvider.enable();
     }
+  }
+
+  getAccounts(): string[] {
+    return this.web3.eth.accounts;
+  }
+
+  getHelloWorld(account: string): string {
+    const contract = this.web3.eth.contract(this.abi);
+    const contractInstance = contract.at('0xac3832C2C27f3Fb8C48a4C7e861031Dd2Db0fDbf');
+    const transactionObject = {
+      from: account,
+      gas: 100000
+    };
+    return contractInstance.GetMessage.call(transactionObject, (error, result) => {
+      console.log(error);
+      console.log(result);
+    });
   }
 }
