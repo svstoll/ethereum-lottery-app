@@ -61,21 +61,11 @@
             </div>
           </div>
           <hr class="lucky-number-rule">
-          <div class="lucky-number-container">
-            <div *ngFor="let luckyNumber of luckyNumbers; let i=index">
-              <div [class.lucky-number-box-active]="chosenLuckyNumber === luckyNumber"
-                   (click)="mutateLuckyNumber(luckyNumber)"
-                   class="number-box lucky-number-box" id="lucky-number-{{i}}">
-                <div class="number">{{luckyNumber}}</div>
-              </div>
-            </div>
-          </div>
-          <hr class="lucky-number-rule">
           <div class="d-flex justify-content-between">
             <button (click)="randomPick()" type="button" class="btn btn-primary button-not-last">
               Random <i class="fas fa-dice"></i>
             </button>
-            <button type="button" class="btn btn-primary" (click)="getBalance()">
+            <button type="button" class="btn btn-primary" (click)="buyTicket()">
               Buy Ticket <i class="fas fa-ticket-alt"></i>
             </button>
           </div>

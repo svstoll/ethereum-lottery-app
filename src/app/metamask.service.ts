@@ -7,43 +7,128 @@ export class MetaMaskService {
 
   abi: any = [
     {
-      "constant": true,
-      "inputs": [],
-      "name": "message",
-      "outputs": [
-        {
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function",
-      "signature": "0xe21f37ce"
-    },
-    {
-      "inputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "constructor",
-      "signature": "constructor"
-    },
-    {
       "constant": false,
       "inputs": [],
-      "name": "GetMessage",
-      "outputs": [
-        {
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function",
-      "signature": "0x03e33b53"
+      "name": "startLottery",
+      "outputs": [],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function"
+    },
+{
+  "constant": false,
+  "inputs": [
+    {
+      "name": "_betNum",
+      "type": "uint16"
     }
-  ];
+    ],
+  "name": "setBet",
+  "outputs": [],
+  "payable": true,
+  "stateMutability": "payable",
+  "type": "function"
+},
+{
+  "constant": true,
+  "inputs": [],
+  "name": "getRandom",
+  "outputs": [
+  {
+    "name": "",
+    "type": "uint16"
+  }
+],
+  "payable": false,
+  "stateMutability": "view",
+  "type": "function"
+},
+{
+  "constant": true,
+  "inputs": [
+  {
+    "name": "",
+    "type": "address"
+  },
+  {
+    "name": "",
+    "type": "uint256"
+  }
+],
+  "name": "tickets",
+  "outputs": [
+  {
+    "name": "betNum",
+    "type": "uint16"
+  },
+  {
+    "name": "round",
+    "type": "uint256"
+  },
+  {
+    "name": "ticketOwner",
+    "type": "address"
+  }
+],
+  "payable": false,
+  "stateMutability": "view",
+  "type": "function"
+},
+{
+  "constant": true,
+  "inputs": [],
+  "name": "getWinners",
+  "outputs": [
+  {
+    "name": "",
+    "type": "address[]"
+  }
+],
+  "payable": false,
+  "stateMutability": "view",
+  "type": "function"
+},
+{
+  "inputs": [
+  {
+    "name": "_price",
+    "type": "uint256"
+  }
+],
+  "payable": true,
+  "stateMutability": "payable",
+  "type": "constructor"
+},
+{
+  "anonymous": false,
+  "inputs": [
+  {
+    "indexed": false,
+    "name": "winners",
+    "type": "address[]"
+  },
+  {
+    "indexed": false,
+    "name": "prizepool",
+    "type": "uint256"
+  }
+],
+  "name": "result",
+  "type": "event"
+},
+{
+  "anonymous": false,
+  "inputs": [],
+  "name": "random",
+  "type": "event"
+},
+{
+  "anonymous": false,
+  "inputs": [],
+  "name": "randomQueryEvent",
+  "type": "event"
+}
+]
 
 
   constructor(@Inject(WEB3) private web3: Web3) {
@@ -60,14 +145,15 @@ export class MetaMaskService {
     return this.web3.eth.accounts;
   }
 
-  getHelloWorld(account: string): string {
+  buyTicket(chosenNumber: number): string {
     const contract = this.web3.eth.contract(this.abi);
-    const contractInstance = contract.at('0xac3832C2C27f3Fb8C48a4C7e861031Dd2Db0fDbf');
+    const contractInstance = contract.at('0xbd06f829f5286a5af886957552b6643ec337af30');
     const transactionObject = {
-      from: account,
-      gas: 100000
+      from: this.getAccounts()[0],
+      gas: 3000000,
+      value: 1000000000000000000
     };
-    return contractInstance.GetMessage.call(transactionObject, (error, result) => {
+    return contractInstance.setBet.sendTransaction(chosenNumber, transactionObject, (error, result) => {
       console.log(error);
       console.log(result);
     });

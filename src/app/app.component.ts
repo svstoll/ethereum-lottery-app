@@ -9,7 +9,7 @@ import {MetaMaskService} from './metamask.service';
 export class AppComponent implements OnInit {
   public lotteryNumbers: number[] = [];
   public chosenNumbers: number[] = [];
-  public amountOfNumbers = 18;
+  public amountOfNumbers = 9;
   public amountToChose = 4;
 
   constructor(private donationService: MetaMaskService) {
@@ -22,16 +22,27 @@ export class AppComponent implements OnInit {
     }
   }
 
-  public getBalance(): void {
-    this.donationService.getHelloWorld(this.donationService.getAccounts()[0]);
+  public buyTicket(): void {
+    if (this.amountToChose !== this.chosenNumbers.length) {
+      // todo: display an error that the amount of numbers needs to be chosen
+      return;
+    }
+    // Converts the numbers for the contract
+    const numberToSend = +this.chosenNumbers
+      .sort()
+      .reverse()
+      .reduce((a, b) => a.toString() + b.toString(), '');
+    this.donationService.buyTicket(numberToSend);
   }
 
+  // Select a number on the grid
   public mutateLotteryNumber(lotteryNumber: number): void {
     (this.chosenNumbers.includes(lotteryNumber)) ?
       this.chosenNumbers = this.chosenNumbers.filter((n) => n !== lotteryNumber) :
       (this.chosenNumbers.length < this.amountToChose) && this.chosenNumbers.push(lotteryNumber);
   }
 
+  // select randomly the numbers on the grid
   public randomPick(): void {
     this.chosenNumbers = [];
     while (this.chosenNumbers.length !== this.amountToChose) {
