@@ -117,6 +117,10 @@ contract LotteryAda is OracleAda{
         return tickets[_account];
     }
 
+    function getWinningNumberForRound(uint _round) public view returns (uint16) {
+        return randomNumbersInRounds[_round];
+    }
+
     constructor(uint _price) public payable {
         price = _price;
         manager = msg.sender;
@@ -171,7 +175,7 @@ contract LotteryAda is OracleAda{
     }
 
     // pay prize to each winner
-    function pay() onlyManager private {
+    function pay() onlyManager internal {
         if(winnersInRounds[round].length != 0) {
             uint priceToWinner = pricePool/winnersInRounds[round].length;
             for(uint i=0;i<winnersInRounds[round].length;i++){
