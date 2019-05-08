@@ -14,6 +14,7 @@
     
 */
 pragma solidity >=0.5.0;
+pragma experimental ABIEncoderV2;
 
 /* Oralce contract
    receive exteranlly generated random number.
@@ -64,7 +65,7 @@ contract LotteryAda is OracleAda{
         address ticketOwner;
     }
 
-    mapping (address =>Bet[]) public tickets;
+    mapping (address =>Bet[]) tickets;
     mapping (uint => mapping(uint24 => address payable[])) ticketholdersInRounds;
     mapping (uint => address payable[]) private winnersInRounds;
     mapping (uint => uint16) randomNumbersInRounds;
@@ -94,6 +95,30 @@ contract LotteryAda is OracleAda{
                 (num%100)/10 > num%10,
                 "Follow the required order of input");
                 _;
+    }
+
+    // To check the winner accounts for a given round
+    function getWinnersForRound(uint _round) public view returns (address payable[] memory) {
+        return winnersInRounds[_round];
+    }
+
+    // to get the current round
+    function getCurrentRound() public view returns (uint) {
+        return round;
+    }
+
+    // to get the pricepool
+    function getPricePool() public view returns (uint) {
+        return pricePool;
+    }
+
+    // Show the Bet Objects for a given address
+    function getTicketsForAddress(address _account) public view returns (Bet[] memory) {
+        return tickets[_account];
+    }
+
+    function getWinningNumberForRound(uint _round) public view returns (uint16) {
+        return randomNumbersInRounds[_round];
     }
 
     constructor(uint _price) public payable {
@@ -149,12 +174,8 @@ contract LotteryAda is OracleAda{
         winnersInRounds[round] = ticketholdersInRounds[round][randomNumbersInRounds[round]];
     }
 
-    function getWinners() public view returns (address payable[] memory) {
-        return winnersInRounds[round - 1];
-    }
-
     // pay prize to each winner
-    function pay() onlyManager private {
+    function pay() onlyManager internal {
         if(winnersInRounds[round].length != 0) {
             uint priceToWinner = pricePool/winnersInRounds[round].length;
             for(uint i=0;i<winnersInRounds[round].length;i++){
