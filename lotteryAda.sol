@@ -22,7 +22,7 @@ import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
    receive exteranlly generated random number.
 */
 
-contract OracleAda{
+contract OracleAda is usingOraclize{
     address owner;
 
     uint16 private randomNum;
@@ -49,7 +49,7 @@ contract OracleAda{
     
 	  function generateRnd() payable public {
 	      string memory query = "https://www.random.org/integer-sets/?sets=1&num=4&min=0&max=9&seqnos=on&commas=on&sort=on&order=index&format=plain&rnd=new";
-	   // generate an uint16 type random number from 0 to 65535
+	   // generate five unique uint16 type random numbers between 0 to 9  
 	      bytes32 queryId = oraclize_query("URL", query);
 	    }
     
