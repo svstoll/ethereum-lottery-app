@@ -13,12 +13,15 @@
     3. The pricepool is acummulated with the price the players pay for a ticket. If somebody wins, the pricepool is paid out and set to 0.
     
 */
+
 pragma solidity >=0.5.0;
 pragma experimental ABIEncoderV2;
+import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
 
 /* Oralce contract
    receive exteranlly generated random number.
 */
+
 contract OracleAda{
     address owner;
 
@@ -39,10 +42,19 @@ contract OracleAda{
         emit randomQueryEvent();
     }
     // receive random number from external source
-    function _callback(uint16 _randomNum) private{
-        randomNum = _randomNum;
+    function _callback(string memory result) public{
+        require(msg.sender == oraclize_cbAddress());
+        randomNum = uint16(parseInt(result));
     }
+    
+	  function generateRnd() payable public {
+	      string memory query = "https://www.random.org/integer-sets/?sets=1&num=4&min=0&max=9&seqnos=on&commas=on&sort=on&order=index&format=plain&rnd=new";
+	   // generate an uint16 type random number from 0 to 65535
+	      bytes32 queryId = oraclize_query("URL", query);
+	    }
+    
     function getRandom() public view returns(uint16){
+        generateRnd();
         return randomNum;
     }
 }
