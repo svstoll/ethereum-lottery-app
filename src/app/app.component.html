@@ -18,25 +18,12 @@
 
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
           <h2>Jackpot</h2>
-          <h2><b>823412.43 Ξ</b></h2>
+          <h2><b>{{pricePool}} <i class="fab fa-ethereum"></i></b></h2>
         </div>
 
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 text-align-right">
           <h2>Next Drawing</h2>
           <h2><b>13.05.2019</b></h2>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <div class="fluid-container bg-primary">
-    <div class="container status-update-container">
-      <div class="row">
-
-        <div class="col-12">
-          <i class="fas fa-redo"></i>
-          <p>Last Update: 13.03.2019, 13:31:31</p>
         </div>
 
       </div>
@@ -50,29 +37,22 @@
         <div class="col-xl-4 col-lg-4 col-md-3 col-sm-2 col-1"></div>
 
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-8 col-10" id="participate">
-          <h2>Participate</h2>
-          <p>You must choose six numbers and one lucky number.</p>
+          <h2>Participate in round {{currentRound}}</h2>
+          <p>You must choose four numbers.</p>
           <div class="lottery-number-container">
             <div *ngFor="let lotteryNumber of lotteryNumbers; let i=index">
-              <div class="number-box" id="lottery-number-{{i}}">
-                <div class="number">{{lotteryNumbers[i]}}</div>
-              </div>
-            </div>
-          </div>
-          <hr class="lucky-number-rule">
-          <div class="lucky-number-container">
-            <div *ngFor="let luckyNumber of luckyNumbers; let i=index">
-              <div class="number-box lucky-number-box" id="lucky-number-{{i}}">
-                <div class="number">{{luckyNumbers[i]}}</div>
+              <div [class.number-box-active]="chosenNumbers.includes(lotteryNumber)"
+                   (click)="mutateLotteryNumber(lotteryNumber)" class="number-box" id="lottery-number-{{i}}">
+                <div class="number">{{lotteryNumber}}</div>
               </div>
             </div>
           </div>
           <hr class="lucky-number-rule">
           <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-primary button-not-last">
+            <button (click)="randomPick()" type="button" class="btn btn-primary button-not-last">
               Random <i class="fas fa-dice"></i>
             </button>
-            <button type="button" class="btn btn-primary" (click)="getBalance()">
+            <button type="button" class="btn btn-primary" (click)="buyTicket()" [disabled]="chosenNumbers.length !== amountToChoose">
               Buy Ticket <i class="fas fa-ticket-alt"></i>
             </button>
           </div>
@@ -91,7 +71,7 @@
 
         <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12" id="ticket-check">
           <hr>
-          <h2>Check Your Tickets</h2>
+          <h2>Check The Winners</h2>
           <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vitae turpis a nisl commodo consequat nec id
             erat. In hac habitasse platea dictumst. In ut ligula eu enim venenatis congue non vel dolor.
@@ -99,18 +79,18 @@
           <table class="table">
             <thead>
             <tr>
+              <th>Round</th>
               <th>Drawing</th>
-              <th>Guess</th>
-              <th>Number</th>
+              <th>Winners</th>
               <th>Payout</th>
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let row of [1]">
-              <td>{{row}}</td>
-              <td>{{row}}</td>
-              <td>{{row}}</td>
-              <td>{{row}}</td>
+            <tr *ngFor="let winninTableEntry of winningTable">
+              <td>{{winninTableEntry.round}}</td>
+              <td>{{winninTableEntry.winningNumbers}}</td>
+              <td>{{winninTableEntry.winners}}</td>
+              <td>{{winninTableEntry.payout}}</td>
             </tr>
             </tbody>
           </table>

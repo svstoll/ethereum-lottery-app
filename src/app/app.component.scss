@@ -40,13 +40,6 @@
   background-clip: content-box;
 }
 
-.lucky-number-container {
-  margin-right: -0.4rem;
-  margin-bottom: -0.4rem;
-  overflow: auto;
-  background-clip: content-box;
-}
-
 .number-box {
   cursor: pointer;
   float: left;
@@ -63,12 +56,11 @@
   background-color: gold;
 }
 
-.lucky-number-box {
-  border-radius: 50%;
+.number-box-active {
   background-color: gold;
 }
 
-.lucky-number-box:hover {
+.lucky-number-box-active {
   background-color: $color-secondary;
 }
 
