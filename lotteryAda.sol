@@ -15,62 +15,50 @@
 */
 
 /* Updated by Fan:
-    1. Random number gain from random.org: please wait for about 40 secs after the query transaction is confirmed;
+    1. Gain random number from random.org repetitively: please wait for about 40 secs after the query transaction being confirmed;
     2. Add weiTrans function to cover the query fee in case that the balance of contract is not enough;
     3. For oracle query, it is free for the first time, but it will charge query fee from the seond time. 
        Since each query is expensive (~0.001 ether), maybe deducting it from pricepool for each round is reasonable.
 */
 
+
 pragma solidity >=0.5.0;
 pragma experimental ABIEncoderV2;
 import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
 
-/* Oralce contract
-   receive exteranlly generated random number.
-*/
-
-contract OracleAda is usingOraclize{
+contract OracleAda is usingOraclize {
+    uint16 public randomNumber;
     address owner;
+    uint public OFee; // oracle query fee + transaction fee, which is about 863300000000000 wei
+    uint public CBalance; // contract balance, should be larger than OFee to query a random number
 
-    uint16 private randomNum;
-    event random();
-    uint public OFee; // oracle query fee + transaction fee, which is about 863300000000000 wei for once
-    uint public CBalance; // contract balance should be larger than OFee to conduct oracle query
-    
     event contractBalance(string description);
-    
-    constructor() payable public{
+
+    constructor() payable public {
         oraclize_setCustomGasPrice(4000000000 wei); // modify the default GasPrice from 20 Gwei to 4Gwei;
         owner = msg.sender;
-    }
-    
-    function () payable external {} // contract payable fallback function: in order to accept ether
-    
+    } 
+    function () payable external { } //contract payable fallback function to accept ether
+
     function weiTrans(uint payValue) payable public {
         address(this).transfer(payValue);
         CBalance = address(this).balance;
         
-    }
+    } 
 
-    // once this event is heard in API
-    event randomQueryEvent();
-    function randomquery() internal{
-        emit randomQueryEvent();
-    }
-    
-    // receive random number from external source
-    function _callback(string memory result) public{
+    function __callback(bytes32 queryId, string memory result, bytes memory proof) public {
         require(msg.sender == oraclize_cbAddress());
-        randomNum = uint16(parseInt(result));
+        randomNumber = uint16(parseInt(result));
     }
     
-	  function generateRnd() payable public {
-	      string memory query = "https://www.random.org/integers/?num=1&min=1000&max=9999&col=1&base=10&format=plain&rnd=new";
+    function getRandomNumber() payable public {
+    
+        string memory query = "https://www.random.org/integers/?num=1&min=1000&max=9999&col=1&base=10&format=plain&rnd=new";
      // generate one uint16 type random number between 1000 to 9999, which is a 4-digit integer; other alternatives are shown below, 
      // but pay attention to different data types 
      // https://www.random.org/integer-sets/?sets=1&num=4&min=0&max=9&seqnos=on&commas=on&sort=on&order=index&format=plain&rnd=new";
      // https://www.random.org/sequences/?min=0&max=9&col=5&format=plain&rnd=new";
-	      
+	     
         OFee = oraclize_getPrice("URL");
         CBalance = address(this).balance;
         if (OFee < CBalance) {
@@ -79,19 +67,20 @@ contract OracleAda is usingOraclize{
         }
         else {
             emit contractBalance("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
-            weiTrans(900000000000000); //transfer wei to this contract automatically
+            weiTrans(900000000000000); //transfer wei to the contract automatically
             emit contractBalance("Oraclize query was sent, standing by for the answer..");
             oraclize_query("URL", query);
-        } 
-
-	  }
-    
-    function getRandom() payable public returns(uint16){
-        generateRnd();
-        return randomNum;
+        }        
+        
     }
+    
+    function generateRnd() payable public returns(uint16) {
+        getRandomNumber();
+        return randomNumber;// after calling the function is confirmed, wait for about 1 min to see the randomNumber
+    }
+ 
+ 
 }
-
 /* Lottery Rule: pick 4 unique numbers from 0 - 9
     random number is generated exteranlly and logged into conrtact.
     The ticket with all numbers match the random number wins (no order).
@@ -103,7 +92,11 @@ contract LotteryAda is OracleAda{
     uint private round;
 
     address manager; // set the manager address to our account address when everything is done.
-
+    event randomQueryEvent();
+    event random();
+    function randomquery() internal{
+        emit randomQueryEvent();
+    }
     struct Bet{
         uint16 betNum;
         uint round;
@@ -154,6 +147,7 @@ contract LotteryAda is OracleAda{
 
     // to get the pricepool
     function getPricePool() public view returns (uint) {
+        
         return pricePool;
     }
 
@@ -170,11 +164,11 @@ contract LotteryAda is OracleAda{
         price = _price;
         manager = msg.sender;
         pricePool = 0;
-        round = 1; 
+        round = 0;
     }
 
     function setBet(uint16 _betNum) cost decreasingOrder(_betNum) public payable{
-
+        
         Bet memory _bet = Bet({betNum:_betNum, round: round, ticketOwner:msg.sender});
         tickets[msg.sender].push(_bet);
 
@@ -192,7 +186,7 @@ contract LotteryAda is OracleAda{
         // update prizepool
         pricePool += msg.value;
     }
-
+    // roughly 2000000 gwei fo value is required
     function startLottery() onlyManager public payable {
         setRandomNumber();
         setWinners();
@@ -202,25 +196,28 @@ contract LotteryAda is OracleAda{
     }
 
 
-    // get random number
-    function setRandomNumber() onlyManager private{
+    // get random number      
+    function setRandomNumber() onlyManager public {
         // query function in Oracle
         /*
         I don't get how the oracle works so i just take a fixed number for testing
         */
+
         randomquery();
-        randomNumbersInRounds[round] = getRandom();
-        
+        randomNumbersInRounds[round] = generateRnd();
+
         //randomNumbersInRounds[round] = 6543;
 
     }
-
-    function setWinners() onlyManager private {
+    
+    
+   // onlyManager
+    function setWinners() onlyManager public {
         winnersInRounds[round] = ticketholdersInRounds[round][randomNumbersInRounds[round]];
     }
 
-    // pay prize to each winner
-    function pay() onlyManager internal {
+    // pay prize to each winner 
+    function pay() onlyManager public {
         if(winnersInRounds[round].length != 0) {
             uint priceToWinner = pricePool/winnersInRounds[round].length;
             for(uint i=0;i<winnersInRounds[round].length;i++){
