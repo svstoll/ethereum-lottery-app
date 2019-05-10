@@ -14,6 +14,13 @@
     
 */
 
+/* Updated by Fan:
+    1. Random number gain from random.org: please wait for about 40 secs after the query transaction is confirmed;
+    2. Add weiTrans function to cover the query fee in case that the balance of contract is not enough;
+    3. For oracle query, it is free for the first time, but it will charge query fee from the seond time. 
+       Since each query is expensive (~0.001 ether), maybe deducting it from pricepool for each round is reasonable.
+*/
+
 pragma solidity >=0.5.0;
 pragma experimental ABIEncoderV2;
 import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
@@ -27,20 +34,30 @@ contract OracleAda is usingOraclize{
 
     uint16 private randomNum;
     event random();
-    constructor() public{
+    uint public OFee; // oracle query fee + transaction fee, which is about 863300000000000 wei for once
+    uint public CBalance; // contract balance should be larger than OFee to conduct oracle query
+    
+    event contractBalance(string description);
+    
+    constructor() payable public{
+        oraclize_setCustomGasPrice(4000000000 wei); // modify the default GasPrice from 20 Gwei to 4Gwei;
         owner = msg.sender;
     }
-    modifier onlyOwner{
-        require(
-            msg.sender == owner,
-            "only owner can call");
-        _;
+    
+    function () payable external {} // contract payable fallback function: in order to accept ether
+    
+    function weiTrans(uint payValue) payable public {
+        address(this).transfer(payValue);
+        CBalance = address(this).balance;
+        
     }
+
     // once this event is heard in API
     event randomQueryEvent();
     function randomquery() internal{
         emit randomQueryEvent();
     }
+    
     // receive random number from external source
     function _callback(string memory result) public{
         require(msg.sender == oraclize_cbAddress());
@@ -48,10 +65,26 @@ contract OracleAda is usingOraclize{
     }
     
 	  function generateRnd() payable public {
-	      string memory query = "https://www.random.org/integer-sets/?sets=1&num=4&min=0&max=9&seqnos=on&commas=on&sort=on&order=index&format=plain&rnd=new";
-	   // generate five unique uint16 type random numbers between 0 to 9  
-	      bytes32 queryId = oraclize_query("URL", query);
-	    }
+	      string memory query = "https://www.random.org/integers/?num=1&min=1000&max=9999&col=1&base=10&format=plain&rnd=new";
+     // generate one uint16 type random number between 1000 to 9999, which is a 4-digit integer; other alternatives are shown below, 
+     // but pay attention to different data types 
+     // https://www.random.org/integer-sets/?sets=1&num=4&min=0&max=9&seqnos=on&commas=on&sort=on&order=index&format=plain&rnd=new";
+     // https://www.random.org/sequences/?min=0&max=9&col=5&format=plain&rnd=new";
+	      
+        OFee = oraclize_getPrice("URL");
+        CBalance = address(this).balance;
+        if (OFee < CBalance) {
+            emit contractBalance("Oraclize query was sent, standing by for the answer..");
+            oraclize_query("URL", query);
+        }
+        else {
+            emit contractBalance("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
+            weiTrans(900000000000000); //transfer wei to this contract automatically
+            emit contractBalance("Oraclize query was sent, standing by for the answer..");
+            oraclize_query("URL", query);
+        } 
+
+	  }
     
     function getRandom() public view returns(uint16){
         generateRnd();
@@ -137,7 +170,7 @@ contract LotteryAda is OracleAda{
         price = _price;
         manager = msg.sender;
         pricePool = 0;
-        round = 1;
+        round = 1; 
     }
 
     function setBet(uint16 _betNum) cost decreasingOrder(_betNum) public payable{
@@ -174,11 +207,11 @@ contract LotteryAda is OracleAda{
         // query function in Oracle
         /*
         I don't get how the oracle works so i just take a fixed number for testing
-
-        randomquery();
-        randomNumbers[round] = getRandom();
         */
-        randomNumbersInRounds[round] = 6543;
+        randomquery();
+        randomNumbersInRounds[round] = getRandom();
+        
+        //randomNumbersInRounds[round] = 6543;
 
     }
 
