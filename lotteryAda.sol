@@ -86,7 +86,7 @@ contract OracleAda is usingOraclize{
 
 	  }
     
-    function getRandom() public view returns(uint16){
+    function getRandom() payable public returns(uint16){
         generateRnd();
         return randomNum;
     }
