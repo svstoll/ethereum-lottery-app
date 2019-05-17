@@ -1,0 +1,89 @@
+@import "~src/styles.scss";
+
+.container {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.title-container {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.status-container {
+  color: $color-text-light
+}
+
+.status-update-container {
+  padding-top: 0;
+  padding-bottom: 0;
+  text-align: center;
+  color: $color-text-light;
+}
+
+.ticket-container {
+  text-align: center;
+}
+
+.ticket-check-container {
+}
+
+.about-container {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.lottery-number-container {
+  margin-right: -0.4rem;
+  margin-bottom: -0.4rem;
+  overflow: auto;
+  background-clip: content-box;
+}
+
+.number-box {
+  cursor: pointer;
+  float: left;
+  background-color: $color-secondary;
+  color: white;
+  width: calc(16.66% - 0.4rem);
+  padding-bottom: calc(16.66% - 0.4rem);
+  margin-right: 0.4rem;
+  margin-bottom: 0.4rem;
+  position: relative;
+  border-radius: 0.4rem;
+}
+
+.number-box:hover {
+  background-color: $color-primary;
+}
+
+.number-box-active {
+  background-color: #ffd600;
+  color: black;
+}
+
+.number-box-active:hover {
+  background-color: #ffc600;
+}
+
+.lucky-number-box-active {
+  background-color: $color-secondary;
+}
+
+.number {
+  transform: translate(-50%, -50%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-weight: bold;
+  font-size: 1rem;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.lucky-number-rule {
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+}

@@ -1,0 +1,132 @@
+<app-layout [network]="networkName">
+
+  <div class="fluid-container bg-secondary">
+    <div class="container title-container">
+      <h1>Join the <b>Ethereum Lottery</b></h1>
+      <p>
+        Are you sick of paying taxes for your lottery winnings? Why don't you join the Ethereum Lottery instead?
+      </p>
+    </div>
+  </div>
+
+  <div class="fluid-container bg-primary">
+    <div class="container status-container">
+      <div class="row">
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12" id="test">
+          <h2>Jackpot</h2>
+          <h2><b>{{jackpot}} Ξ</b></h2>
+          <button type="button" class="btn btn-secondary" (click)="checkWinnings()">
+            Check Winnings
+          </button>
+        </div>
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 text-align-right">
+          <h2>Time Left</h2>
+          <h2><b>{{timeLeftDisplayText}}</b></h2>
+          <button type="button" class="btn btn-secondary" (click)="drawWinningNumbers()">
+            Draw Numbers
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="fluid-container bg-light">
+    <div class="container ticket-container">
+      <div class="row">
+
+        <div class="col-xl-4 col-lg-4 col-md-3 col-sm-2 col-1"></div>
+
+        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-8 col-10" id="participate">
+          <h2>Participate in Round</h2>
+          <p>You must choose exactly four numbers.</p>
+          <div class="lottery-number-container">
+            <div *ngFor="let lotteryNumber of lotteryNumbers; let i=index">
+              <div [class.number-box-active]="chosenNumbers.includes(lotteryNumber)"
+                   (click)="mutateLotteryNumber(lotteryNumber)" class="number-box" id="lottery-number-{{i}}">
+                <div class="number">{{lotteryNumber}}</div>
+              </div>
+            </div>
+          </div>
+          <hr class="lucky-number-rule">
+          <div class="d-flex justify-content-between">
+            <button (click)="randomPick()" type="button" class="btn btn-primary button-not-last">
+              Random <i class="fas fa-dice"></i>
+            </button>
+            <button type="button" class="btn btn-primary" (click)="buyTicket()" [disabled]="chosenNumbers.length !== amountToChoose">
+              Buy Ticket <i class="fas fa-ticket-alt"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-4 col-md-3 col-sm-2 col-1"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fluid-container bg-light">
+    <div class="container ticket-check-container">
+      <div class="row">
+
+        <div class="col-xl-2 col-lg-2 col-md-0 col-sm-0 col-0"></div>
+
+        <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12" id="ticket-check">
+          <hr>
+          <h2>Check The Winners</h2>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vitae turpis a nisl commodo consequat nec id
+            erat. In hac habitasse platea dictumst. In ut ligula eu enim venenatis congue non vel dolor.
+          </p>
+          <table class="table">
+            <thead>
+            <tr>
+              <th>Round</th>
+              <th>Drawing</th>
+              <th>Winners</th>
+              <th>Payout</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let winninTableEntry of winningTable">
+              <td>{{winninTableEntry.round}}</td>
+              <td>{{winninTableEntry.winningNumbers}}</td>
+              <td>{{winninTableEntry.winners}}</td>
+              <td>{{winninTableEntry.payout}}</td>
+            </tr>
+            </tbody>
+          </table>
+          <hr>
+          <div class="d-flex">
+            <button type="button" class="btn btn-primary">
+              Check
+            </button>
+          </div>
+        </div>
+
+        <div class="col-xl-2 col-lg-2 col-md-0 col-sm-0 col-0"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="fluid-container bg-secondary">
+    <div class="container about-container">
+      <div class="row">
+
+        <div class="col-12" id="about">
+          <h1>About</h1>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vitae turpis a nisl commodo consequat nec id
+            erat. In hac habitasse platea dictumst. In ut ligula eu enim venenatis congue non vel dolor. Cras vitae
+            efficitur sapien. Pellentesque gravida metus mauris, vel placerat ex tincidunt sed. Curabitur quis egestas ex.
+            Suspendisse tincidunt eleifend interdum.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</app-layout>

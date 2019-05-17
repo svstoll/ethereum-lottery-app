@@ -4,3 +4,5 @@ export class WinninTableEntry {
   winners: string[] = [];
   payout: number;
 }
+
+
