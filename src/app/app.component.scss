@@ -44,6 +44,7 @@
   cursor: pointer;
   float: left;
   background-color: $color-secondary;
+  color: white;
   width: calc(16.66% - 0.4rem);
   padding-bottom: calc(16.66% - 0.4rem);
   margin-right: 0.4rem;
@@ -53,11 +54,16 @@
 }
 
 .number-box:hover {
-  background-color: gold;
+  background-color: $color-primary;
 }
 
 .number-box-active {
-  background-color: gold;
+  background-color: #ffd600;
+  color: black;
+}
+
+.number-box-active:hover {
+  background-color: #ffc600;
 }
 
 .lucky-number-box-active {
@@ -69,15 +75,15 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  color: white;
   font-weight: bold;
   font-size: 1rem;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .lucky-number-rule {
   margin-top: 0.4rem;
   margin-bottom: 0.4rem;
 }
-
-
-

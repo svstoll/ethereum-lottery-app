@@ -4,6 +4,7 @@
     <div class="container title-container">
       <h1>Join the <b>Ethereum Lottery</b></h1>
       <p>
+        Are you sick of paying taxes for your lottery winnings? Why don't you join the Ethereum Lottery instead?
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vitae turpis a nisl commodo consequat nec id
         erat. In hac habitasse platea dictumst. In ut ligula eu enim venenatis congue non vel dolor. Cras vitae
         efficitur sapien. Pellentesque gravida metus mauris, vel placerat ex tincidunt sed. Curabitur quis egestas ex.
@@ -16,14 +17,20 @@
     <div class="container status-container">
       <div class="row">
 
-        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12" id="test">
           <h2>Jackpot</h2>
-          <h2><b>{{pricePool}} <i class="fab fa-ethereum"></i></b></h2>
+          <h2><b>{{jackpot}} Ξ</b></h2>
+          <button type="button" class="btn btn-secondary" (click)="checkWinnings()">
+            Check Winnings
+          </button>
         </div>
 
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 text-align-right">
-          <h2>Next Drawing</h2>
-          <h2><b>13.05.2019</b></h2>
+          <h2>Time Left</h2>
+          <h2><b>{{timeLeftDisplayText}}</b></h2>
+          <button type="button" class="btn btn-secondary" (click)="drawWinningNumbers()">
+            Draw Numbers
+          </button>
         </div>
 
       </div>
@@ -37,8 +44,8 @@
         <div class="col-xl-4 col-lg-4 col-md-3 col-sm-2 col-1"></div>
 
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-8 col-10" id="participate">
-          <h2>Participate in round {{currentRound}}</h2>
-          <p>You must choose four numbers.</p>
+          <h2>Participate in Round</h2>
+          <p>You must choose exactly four numbers.</p>
           <div class="lottery-number-container">
             <div *ngFor="let lotteryNumber of lotteryNumbers; let i=index">
               <div [class.number-box-active]="chosenNumbers.includes(lotteryNumber)"

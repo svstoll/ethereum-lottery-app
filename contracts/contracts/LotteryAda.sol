@@ -1,89 +1,7 @@
 pragma solidity >=0.5.0;
 pragma experimental ABIEncoderV2;
 
-import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
-
-contract OracleAda is usingOraclize {
-
-    event Log(uint);
-    event QuerySentEvent(string description);
-    event QueryNotSentEvent(string description);
-    event QueryFinishedEvent(string description);
-
-    address payable private owner;
-
-    bool private testMode = false;
-    string private randomQuery = "https://www.random.org/integer-sets/?sets=1&num=4&min=10&max=19&seqnos=on&commas=on&sort=on&order=index&format=plain&rnd=new";
-    mapping(bytes32 => string) private generatedNumbers;
-    mapping(bytes32 => bool) private isQueryProcessedByQueryId;
-
-    constructor() public payable {
-        owner = msg.sender;
-    }
-
-    function() external payable {
-        // Fallback 'payable' function is needed for a contract to accept ETH payments.
-    }
-
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Function can only be executed by contract owner.");
-        _;
-    }
-
-    function transferOwnership(address payable _newOwner) public onlyOwner {
-        owner = _newOwner;
-    }
-
-    function retrieveProfit() public onlyOwner {
-        owner.transfer(address(this).balance);
-    }
-
-    function activateTestMode(bool _activateTestMode) public onlyOwner {
-        testMode = _activateTestMode;
-    }
-
-    function generateRandomNumber() public returns (bytes32) {
-        uint oracleFee = oraclize_getPrice("URL");
-        emit Log(oracleFee);
-
-        bytes32 queryId;
-        if (oracleFee <= address(this).balance) {
-            queryId = oraclize_query("URL", randomQuery);
-            emit QuerySentEvent("Oraclize query was sent, waiting for the answer...");
-        } else {
-            emit QueryNotSentEvent("Oraclize query was not sent, please add some ETH to cover for the query fee.");
-        }
-
-        return queryId;
-    }
-
-    function __callback(bytes32 queryId, string memory result) public {
-        require(msg.sender == oraclize_cbAddress());
-
-        isQueryProcessedByQueryId[queryId] = true;
-        if (testMode) {
-            generatedNumbers[queryId] = "1234";
-        } else {
-            generatedNumbers[queryId] = result;
-        }
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Getters
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    function isQueryProcessed(bytes32 queryId) public view returns (bool) {
-        return isQueryProcessedByQueryId[queryId];
-    }
-
-    function getRandomNumber(bytes32 queryId) public view returns(string memory) {
-        return generatedNumbers[queryId];
-    }
-
-    function getBalance() public view returns (uint) {
-        return address(this).balance;
-    }
-}
+import "./OracleAda.sol";
 
 contract LotteryAda {
 
@@ -107,7 +25,7 @@ contract LotteryAda {
     bytes32 private lastOracleQueryId;
     uint private failedOracleAttempts = 0;
 
-    uint private price = 1 ether;
+    uint private price = 0.02 ether;
     uint private jackpot = 0;
 
     uint private roundStart;
@@ -169,7 +87,7 @@ contract LotteryAda {
     modifier isLotteryOpen() {
         require(!lotteryClosed, "The lottery is closed.");
         require(!hasRoundEnded(),
-            "The current has ended. Call 'drawWinningNumber' and 'checkWinnings' to distribute winnings and start a new round.");
+            "The current has ended. Call 'drawWinningNumbers' and 'checkWinnings' to distribute winnings and start a new round.");
         _;
     }
 
@@ -178,7 +96,7 @@ contract LotteryAda {
         _;
     }
 
-    function drawWinningNumber() public isDrawWinningNumbersAllowed {
+    function drawWinningNumbers() public isDrawWinningNumbersAllowed {
         if (currentParticipants == 0) {
             drawingFinished = true;
             return;
@@ -334,6 +252,22 @@ contract LotteryAda {
 
     function getCurrentRoundStart() public view returns (uint) {
         return roundStart;
+    }
+
+    function getCurrentRoundEnd() public view returns (uint) {
+        return roundStart + roundDuration;
+    }
+
+    function getRoundDuration() public view returns (uint) {
+        return roundDuration;
+    }
+    
+    function getTimeLeft() public view returns (uint) {
+        if (hasRoundEnded()) {
+            return 0;
+        } else {
+            return now - roundStart - roundDuration;
+        }
     }
 
     function getJackpot() public view returns (uint) {
