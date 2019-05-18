@@ -1,14 +1,40 @@
 import {Inject, Injectable} from '@angular/core';
-import { WEB3 } from './web3';
+import {WEB3} from './web3';
 import Web3 from 'web3';
-import {bindNodeCallback} from 'rxjs';
-import {async} from 'rxjs/internal/scheduler/async';
 import {environment} from '../environments/environment';
 
 @Injectable()
 export class MetaMaskService {
 
   ORACLE_ABI: any = [
+    {
+      constant: true,
+      inputs: [],
+      name: 'getBalance',
+      outputs: [
+        {
+          name: '',
+          type: 'uint256'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: false,
+      inputs: [
+        {
+          name: '_activateTestMode',
+          type: 'bool'
+        }
+      ],
+      name: 'activateTestMode',
+      outputs: [],
+      payable: false,
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
     {
       constant: false,
       inputs: [
@@ -51,16 +77,30 @@ export class MetaMaskService {
     },
     {
       constant: false,
-      inputs: [
-        {
-          name: '_activateTestMode',
-          type: 'bool'
-        }
-      ],
-      name: 'activateTestMode',
+      inputs: [],
+      name: 'retrieveProfit',
       outputs: [],
       payable: false,
       stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [
+        {
+          name: 'queryId',
+          type: 'bytes32'
+        }
+      ],
+      name: 'isQueryProcessed',
+      outputs: [
+        {
+          name: '',
+          type: 'bool'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
       type: 'function'
     },
     {
@@ -75,102 +115,6 @@ export class MetaMaskService {
       ],
       payable: false,
       stateMutability: 'nonpayable',
-      type: 'function'
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: false,
-          name: '',
-          type: 'uint256'
-        }
-      ],
-      name: 'Log',
-      type: 'event'
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: false,
-          name: 'description',
-          type: 'string'
-        }
-      ],
-      name: 'QuerySentEvent',
-      type: 'event'
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: false,
-          name: 'description',
-          type: 'string'
-        }
-      ],
-      name: 'QueryNotSentEvent',
-      type: 'event'
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: false,
-          name: 'description',
-          type: 'string'
-        }
-      ],
-      name: 'QueryFinishedEvent',
-      type: 'event'
-    },
-    {
-      constant: false,
-      inputs: [],
-      name: 'retrieveProfit',
-      outputs: [],
-      payable: false,
-      stateMutability: 'nonpayable',
-      type: 'function'
-    },
-    {
-      constant: false,
-      inputs: [
-        {
-          name: '_newOwner',
-          type: 'address'
-        }
-      ],
-      name: 'transferOwnership',
-      outputs: [],
-      payable: false,
-      stateMutability: 'nonpayable',
-      type: 'function'
-    },
-    {
-      payable: true,
-      stateMutability: 'payable',
-      type: 'fallback'
-    },
-    {
-      inputs: [],
-      payable: true,
-      stateMutability: 'payable',
-      type: 'constructor'
-    },
-    {
-      constant: true,
-      inputs: [],
-      name: 'getBalance',
-      outputs: [
-        {
-          name: '',
-          type: 'uint256'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
       type: 'function'
     },
     {
@@ -193,13 +137,93 @@ export class MetaMaskService {
       type: 'function'
     },
     {
-      constant: true,
+      constant: false,
       inputs: [
         {
-          name: 'queryId',
-          type: 'bytes32'
+          name: '_newOwner',
+          type: 'address'
         }
       ],
+      name: 'transferOwnership',
+      outputs: [],
+      payable: false,
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [
+        {
+          name: '_testMode',
+          type: 'bool'
+        },
+        {
+          name: '_privateNetwork',
+          type: 'bool'
+        }
+      ],
+      payable: true,
+      stateMutability: 'payable',
+      type: 'constructor'
+    },
+    {
+      payable: true,
+      stateMutability: 'payable',
+      type: 'fallback'
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          name: '_oracleFee',
+          type: 'uint256'
+        }
+      ],
+      name: 'CurrentOracleFeeEvent',
+      type: 'event'
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          name: '_description',
+          type: 'string'
+        }
+      ],
+      name: 'QuerySentEvent',
+      type: 'event'
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          name: '_description',
+          type: 'string'
+        }
+      ],
+      name: 'QueryNotSentEvent',
+      type: 'event'
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          name: '_description',
+          type: 'string'
+        }
+      ],
+      name: 'QueryFinishedEvent',
+      type: 'event'
+    }
+  ];
+
+  LOTTERY_ABI: any = [
+    {
+      constant: true,
+      inputs: [],
       name: 'isQueryProcessed',
       outputs: [
         {
@@ -210,10 +234,21 @@ export class MetaMaskService {
       payable: false,
       stateMutability: 'view',
       type: 'function'
-    }
-  ];
-
-  LOTTERY_ABI: any = [
+    },
+    {
+      constant: true,
+      inputs: [],
+      name: 'isWaitingForWinningNumbers',
+      outputs: [
+        {
+          name: '',
+          type: 'bool'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
     {
       constant: true,
       inputs: [],
@@ -222,6 +257,20 @@ export class MetaMaskService {
         {
           name: '',
           type: 'uint256'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [],
+      name: 'isForcedRoundEnd',
+      outputs: [
+        {
+          name: '',
+          type: 'bool'
         }
       ],
       payable: false,
@@ -281,6 +330,20 @@ export class MetaMaskService {
     {
       constant: true,
       inputs: [],
+      name: 'hasDrawingFinished',
+      outputs: [
+        {
+          name: '',
+          type: 'bool'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [],
       name: 'getRoundDuration',
       outputs: [
         {
@@ -327,6 +390,20 @@ export class MetaMaskService {
     },
     {
       constant: true,
+      inputs: [],
+      name: 'isLotteryClosed',
+      outputs: [
+        {
+          name: '',
+          type: 'bool'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
       inputs: [
         {
           name: '_account',
@@ -361,7 +438,7 @@ export class MetaMaskService {
     {
       constant: true,
       inputs: [],
-      name: 'getTimeLeft',
+      name: 'getCurrentParticipants',
       outputs: [
         {
           name: '',
@@ -439,8 +516,25 @@ export class MetaMaskService {
       inputs: [
         {
           indexed: false,
-          name: 'description',
+          name: '_description',
           type: 'string'
+        }
+      ],
+      name: 'LotteryClosedEvent',
+      type: 'event'
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          name: '_description',
+          type: 'string'
+        },
+        {
+          indexed: true,
+          name: '_roundStart',
+          type: 'uint256'
         }
       ],
       name: 'RoundStartEvent',
@@ -451,8 +545,13 @@ export class MetaMaskService {
       inputs: [
         {
           indexed: false,
-          name: 'description',
+          name: '_description',
           type: 'string'
+        },
+        {
+          indexed: true,
+          name: '_roundStart',
+          type: 'uint256'
         }
       ],
       name: 'ProvideOracleFeeEvent',
@@ -463,8 +562,30 @@ export class MetaMaskService {
       inputs: [
         {
           indexed: false,
-          name: 'description',
+          name: '_description',
           type: 'string'
+        },
+        {
+          indexed: true,
+          name: '_roundStart',
+          type: 'uint256'
+        }
+      ],
+      name: 'DrawingFinishedEvent',
+      type: 'event'
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          name: '_description',
+          type: 'string'
+        },
+        {
+          indexed: true,
+          name: '_roundStart',
+          type: 'uint256'
         }
       ],
       name: 'UnfinishedBatchProcessingEvent',
@@ -475,17 +596,38 @@ export class MetaMaskService {
       inputs: [
         {
           indexed: false,
-          name: 'description',
+          name: '_description',
           type: 'string'
+        },
+        {
+          indexed: true,
+          name: '_to',
+          type: 'address'
         }
       ],
       name: 'PayoutEvent',
+      type: 'event'
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          name: '_description',
+          type: 'string'
+        },
+        {
+          indexed: true,
+          name: '_roundStart',
+          type: 'uint256'
+        }
+      ],
+      name: 'ForcedRoundEndEvent',
       type: 'event'
     }
   ];
 
   public currentNetwork: string;
-
   public oracleContract: any;
   public lotteryContract: any;
 
@@ -507,6 +649,12 @@ export class MetaMaskService {
     await this.lotteryContract.methods.checkWinnings().send(transactionObj);
   }
 
+  public async closeLottery() {
+    const accounts = await this.web3.eth.getAccounts();
+    const transactionObj = await this.getTransactionObject(accounts[0], 5000000, 0);
+    await this.lotteryContract.methods.closeLottery().send(transactionObj);
+  }
+
   constructor(@Inject(WEB3) private web3: Web3) {
   }
 
@@ -526,7 +674,6 @@ export class MetaMaskService {
         this.lotteryContract = await new this.web3.eth.Contract(this.LOTTERY_ABI, environment.privateLotteryAddress);
         break;
     }
-
   }
 
   async getTransactionObject(FROM: string, GAS: number, VALUE: number) {

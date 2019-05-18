@@ -11,18 +11,14 @@
 }
 
 .status-container {
-  color: $color-text-light
-}
-
-.status-update-container {
-  padding-top: 0;
-  padding-bottom: 0;
-  text-align: center;
   color: $color-text-light;
 }
 
-.ticket-container {
-  text-align: center;
+.winning-numbers-drawn-container {
+}
+
+.lottery-closed-container {
+  color: $color-text-light;
 }
 
 .ticket-check-container {
@@ -58,12 +54,12 @@
 }
 
 .number-box-active {
-  background-color: #ffd600;
+  background-color: $color-accent;
   color: black;
 }
 
 .number-box-active:hover {
-  background-color: #ffc600;
+  background-color: #d9b600;
 }
 
 .lucky-number-box-active {

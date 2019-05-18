@@ -7,12 +7,14 @@
 $color-primary: #4a626d;
 $color-secondary: #778f9b;
 $color-light: #f5f5f6;
+$color-accent: #ffd600;
 $color-text-light: white;
 
 $theme-colors: (
   "primary": $color-primary,
   "secondary": $color-secondary,
-  "light": $color-light
+  "light": $color-light,
+  "warning": $color-accent
 );
 
 // Bootstrap import must be done after modifying Bootstrap variables.

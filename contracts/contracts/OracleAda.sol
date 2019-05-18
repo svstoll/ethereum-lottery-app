@@ -1,26 +1,27 @@
 pragma solidity >=0.5.0;
-pragma experimental ABIEncoderV2;
 
 import "./oraclizeAPI.sol";
 
 contract OracleAda is usingOraclize {
 
-    event Log(uint);
-    event QuerySentEvent(string description);
-    event QueryNotSentEvent(string description);
-    event QueryFinishedEvent(string description);
+    event CurrentOracleFeeEvent(uint _oracleFee);
+    event QuerySentEvent(string _description);
+    event QueryNotSentEvent(string _description);
+    event QueryFinishedEvent(string _description);
 
     address payable private owner;
 
     bool private testMode = false;
-    string private randomQuery = "https://www.random.org/integer-sets/?sets=1&num=4&min=10&max=19&seqnos=on&commas=on&sort=on&order=index&format=plain&rnd=new";
+    string private randomQuery = "https://www.random.org/integer-sets/?sets=1&num=4&min=1&max=24&seqnos=on&commas=on&sort=on&order=index&format=plain&rnd=new";
     mapping(bytes32 => string) private generatedNumbers;
     mapping(bytes32 => bool) private isQueryProcessedByQueryId;
 
-    constructor() public payable {
+    constructor(bool _testMode, bool _privateNetwork) public payable {
         owner = msg.sender;
-        OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);
-
+        if (_privateNetwork) {
+            OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);
+        }
+        testMode = _testMode;
     }
 
     function() external payable {
@@ -46,7 +47,7 @@ contract OracleAda is usingOraclize {
 
     function generateRandomNumber() public returns (bytes32) {
         uint oracleFee = oraclize_getPrice("URL");
-        emit Log(oracleFee);
+        emit CurrentOracleFeeEvent(oracleFee);
 
         bytes32 queryId;
         if (oracleFee <= address(this).balance) {
@@ -64,10 +65,11 @@ contract OracleAda is usingOraclize {
 
         isQueryProcessedByQueryId[queryId] = true;
         if (testMode) {
-            generatedNumbers[queryId] = "1234";
+            generatedNumbers[queryId] = "Set 1: 1, 2, 3, 4";
         } else {
             generatedNumbers[queryId] = result;
         }
+        emit QueryFinishedEvent('Oraclize query was successful.');
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////

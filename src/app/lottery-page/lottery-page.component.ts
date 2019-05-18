@@ -9,17 +9,23 @@ import {MetaMaskService} from '../metamask.service';
   styleUrls: ['./lottery-page.component.scss']
 })
 export class LotteryPageComponent implements OnInit, OnDestroy {
+  public networkName: string;
 
   private lotteryNumbers: number[] = [];
   private chosenNumbers: number[] = [];
   private amountOfNumbers = 24;
   private amountToChoose = 4;
-  private jackpot: number;
+  private jackpot = 'Updating';
   private timeLeft = 0;
-  private timeLeftDisplayText: string;
-  private roundTimerSubscription: Subscription;
+  private timeLeftDisplayText = 'Updating';
+  private lotteryClosed = false;
+  private forcedRoundEnd: boolean;
+  private currentParticipants: number;
+  private waitingForWinningNumbers = false;
+  private queryProcessed: boolean;
+  private drawingFinished: boolean;
   private winningTable: WinninTableEntry[] = [];
-  public networkName: string;
+  private updateSubscrption: Subscription;
 
   constructor(private metaMaskService: MetaMaskService,
               private ngZone: NgZone) {
@@ -28,27 +34,106 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     await this.metaMaskService.init();
     this.networkName = this.metaMaskService.currentNetwork;
-    for (let i = 0; i < this.amountOfNumbers; i++) {
-      this.lotteryNumbers[i] = i + 1;
-    }
-    await this.setJackpot();
-    await this.setTimeLeft();
-
+    await this.initLottery();
+    this.startEventListening();
 
     this.ngZone.run(() => {
-      this.roundTimerSubscription = timer(1000, 1000).subscribe(x =>  {
-        this.timeLeft = this.timeLeft - 1;
-        this.updateTimerDisplayText();
+      this.updateSubscrption = timer(1, 1000).subscribe(x =>  {
+        this.updateLottery(x);
       });
     });
   }
 
   ngOnDestroy(): void {
-    this.roundTimerSubscription.unsubscribe();
+    this.updateSubscrption.unsubscribe();
+  }
+
+  private async initLottery() {
+    for (let i = 0; i < this.amountOfNumbers; i++) {
+      this.lotteryNumbers[i] = i + 1;
+    }
+
+    this.updateLotteryClosed();
+    this.updateForcedRoundEnd();
+    this.updateCurrentParticipants();
+    this.updateDrawingFinished();
+    this.updateQueryProcessed();
+    this.updateWaitingForWinningNumbers();
+    await this.updateJackpot();
+    await this.updateTimeLeft();
+  }
+
+  private updateLottery(tick: number) {
+    this.timeLeft = this.timeLeft - 1;
+    if (tick % 10 === 0) {
+      this.updateTimeLeft();
+      this.updateJackpot();
+      this.updateCurrentParticipants();
+      this.updateDrawingFinished();
+      this.updateLotteryClosed();
+      this.updateForcedRoundEnd();
+      this.updateQueryProcessed();
+      this.updateWaitingForWinningNumbers();
+    }
+
+    this.updateTimerDisplayText();
+  }
+
+  private startEventListening() {
+    // TODO: Replace alerts with modal windows.
+    this.metaMaskService.lotteryContract.events.allEvents({
+      fromBlock: 'latest'
+    }, (error, event) => {
+      if (error) {
+        console.error('Error while waiting for lottery contract events.');
+        return;
+      }
+      console.log('Lottery contract event arrived.', event);
+      switch (event.event) {
+        case 'LotteryClosedEvent':
+          this.lotteryClosed = true;
+          break;
+        case 'ForcedRoundEndEvent':
+          this.forcedRoundEnd = true;
+          break;
+        case 'ProvideOracleFeeEvent':
+          alert('The winning numbers could not be drawn because the oracle fee could not be paid for. ' +
+            'Someone must send some funds to the oracle contract.');
+          break;
+        case 'DrawingFinishedEvent':
+          this.updateLottery(0);
+          break;
+        case 'PayoutEvent':
+          // TODO: Differentiate between winnings and refunds.
+          // TODO: Filter for sender account payouts.
+          alert('Congratulations, you have won in the lottery. Your winnings have been transferred to your account.');
+          break;
+        case 'RoundStartEvent':
+          this.updateLottery(0);
+          break;
+      }
+    });
+
+    // TODO: All events from both contracts are duplicated for some reason whenever a new listener is registered.
+    //       Only register to one contract?
+    this.metaMaskService.oracleContract.events.allEvents({
+      fromBlock: 'latest'
+    }, (error, event) => {
+      if (error) {
+        console.error('Error while waiting for oracle contract events.');
+        return;
+      }
+      console.log('Oracle contract event arrived.', event);
+      switch (event.event) {
+        case 'QueryFinishedEvent':
+          this.updateLottery(0);
+          break;
+      }
+    });
   }
 
   private updateTimerDisplayText() {
-    if (this.timeLeft <= 0) {
+    if (this.lotteryClosed || this.timeLeft <= 0 || this.forcedRoundEnd) {
       this.timeLeftDisplayText = 'Round has ended';
       return;
     }
@@ -70,14 +155,45 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
     ].join(' ');
   }
 
-  public async setJackpot() {
-    const jp = await this.metaMaskService.lotteryContract.methods.getJackpot().call();
-    this.jackpot = (+jp.toString() / Math.pow(10, 18));
+  public async updateJackpot() {
+    const jackpot = await this.metaMaskService.lotteryContract.methods.getJackpot().call();
+    this.jackpot = (+jackpot.toString() / Math.pow(10, 18)) + ' Ξ';
   }
 
-  public async setTimeLeft() {
-    const tl = await this.metaMaskService.lotteryContract.methods.getTimeLeft().call();
-    this.timeLeft = tl;
+  public async updateTimeLeft() {
+    const roundEnd = await this.metaMaskService.lotteryContract.methods.getCurrentRoundEnd().call();
+    const now = new Date();
+    this.timeLeft = Math.floor((+roundEnd.toString()) - (now.getTime() / 1000));
+  }
+
+  public async updateCurrentParticipants() {
+    const currentParticipants = await this.metaMaskService.lotteryContract.methods.getCurrentParticipants().call();
+    this.currentParticipants = +currentParticipants.toString();
+  }
+
+  public async updateLotteryClosed() {
+    const lotteryClosed = await this.metaMaskService.lotteryContract.methods.isLotteryClosed().call();
+    this.lotteryClosed = lotteryClosed;
+  }
+
+  public async updateForcedRoundEnd() {
+    const forcedRoundEnd = await this.metaMaskService.lotteryContract.methods.isForcedRoundEnd().call();
+    this.forcedRoundEnd = forcedRoundEnd;
+  }
+
+  public async updateDrawingFinished() {
+    const drawingFinished = await this.metaMaskService.lotteryContract.methods.hasDrawingFinished().call();
+    this.drawingFinished = drawingFinished;
+  }
+
+  public async updateQueryProcessed() {
+    const queryProcessed = await this.metaMaskService.lotteryContract.methods.isQueryProcessed().call();
+    this.queryProcessed = queryProcessed;
+  }
+
+  public async updateWaitingForWinningNumbers() {
+    const waitingForWinningNumbers = await this.metaMaskService.lotteryContract.methods.isWaitingForWinningNumbers().call();
+    this.waitingForWinningNumbers = waitingForWinningNumbers;
   }
 
   public async buyTicket() {
@@ -88,8 +204,13 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
     const stringifiedNumbers = this.chosenNumbers
       .sort((n1, n2) => n1 - n2)
       .join(', ');
-    await this.metaMaskService.buyTicket(stringifiedNumbers);
-    await this.setJackpot();
+    await this.metaMaskService.buyTicket('Set 1: ' + stringifiedNumbers);
+    this.chosenNumbers = [];
+    await this.updateJackpot();
+  }
+
+  public async checkRefunds() {
+    await this.metaMaskService.closeLottery();
   }
 
   // Select a number on the grid
@@ -116,5 +237,22 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
 
   public async checkWinnings() {
     await this.metaMaskService.checkWinnings();
+  }
+
+  public isDrawWinningNumbersDisabled(): boolean {
+    return this.lotteryClosed || !this.hasRoundEnded() || this.waitingForWinningNumbers || this.drawingFinished;
+  }
+
+  public showCheckWinningsBanner(): boolean {
+    return !this.lotteryClosed && this.hasRoundEnded() &&
+      (this.drawingFinished || (this.currentParticipants > 0 && this.waitingForWinningNumbers && this.queryProcessed));
+  }
+
+  public isBuyTicketsButtonDisabled(): boolean {
+    return this.lotteryClosed || this.hasRoundEnded() || this.chosenNumbers.length !== this.amountToChoose;
+  }
+
+  private hasRoundEnded(): boolean {
+    return this.forcedRoundEnd || this.timeLeft <= 0;
   }
 }

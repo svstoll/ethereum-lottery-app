@@ -11,10 +11,13 @@ contract LotteryAda {
         address ticketOwner;
     }
 
-    event RoundStartEvent(string description);
-    event ProvideOracleFeeEvent(string description);
-    event UnfinishedBatchProcessingEvent(string description);
-    event PayoutEvent(string description);
+    event LotteryClosedEvent(string _description);
+    event RoundStartEvent(string _description, uint indexed _roundStart);
+    event ProvideOracleFeeEvent(string _description, uint indexed _roundStart);
+    event DrawingFinishedEvent(string _description, uint indexed _roundStart);
+    event UnfinishedBatchProcessingEvent(string _description, uint indexed _roundStart);
+    event PayoutEvent(string _description, address payable indexed _to);
+    event ForcedRoundEndEvent(string _description, uint indexed _roundStart);
 
     address private owner;
     uint private batchSize = 1;
@@ -72,6 +75,7 @@ contract LotteryAda {
 
     function endRound() public onlyOwner {
         forcedRoundEnd = true;
+        emit ForcedRoundEndEvent("Current round was ended by contract owner.", roundStart);
     }
 
     function buyTicket(string memory _chosenNumbers) public payable isLotteryOpen hasCorrectPrice {
@@ -99,6 +103,7 @@ contract LotteryAda {
     function drawWinningNumbers() public isDrawWinningNumbersAllowed {
         if (currentParticipants == 0) {
             drawingFinished = true;
+            emit DrawingFinishedEvent("No ticket was bought in this round, no need to draw a winning numbers.", roundStart);
             return;
         }
 
@@ -118,7 +123,7 @@ contract LotteryAda {
                 waitingForWinningNumbers = true;
             }
         } else {
-            emit ProvideOracleFeeEvent("The contract balance is not large enough to pay the oracle fee. Transfer some ether to the contract.");
+            emit ProvideOracleFeeEvent("The contract balance is not large enough to pay the oracle fee. Transfer some ether to the contract.", roundStart);
         }
     }
 
@@ -145,7 +150,7 @@ contract LotteryAda {
             uint winningsForCaller = winningsByAddress[msg.sender];
             winningsByAddress[msg.sender] = 0;
             msg.sender.transfer(winningsForCaller);
-            emit PayoutEvent("You have won the lottery. Your share of the jackpot has been transered to your account.");
+            emit PayoutEvent("You have won the lottery. Your share of the jackpot has been transered to your account.", msg.sender);
         }
     }
 
@@ -156,6 +161,7 @@ contract LotteryAda {
             if (bytes(randomNumbers).length > 0) {
                 winningNumbersByRoundStart[roundStart] = randomNumbers;
                 drawingFinished = true;
+                emit DrawingFinishedEvent("Winning numbers have been drawn.", roundStart);
             } else {
               failedOracleAttempts++;
             }
@@ -199,7 +205,7 @@ contract LotteryAda {
             initiateNextRound();
         }
         else {
-            emit UnfinishedBatchProcessingEvent("Not all winners have been processed, yet. Keep calling the 'checkWinnings()' function until all winner have been processed to start the next round.");
+            emit UnfinishedBatchProcessingEvent("Not all winners have been processed, yet. Keep calling the 'checkWinnings()' function until all winner have been processed to start the next round.", roundStart);
         }
     }
 
@@ -210,11 +216,14 @@ contract LotteryAda {
         processedWinners = 0;
         currentParticipants = 0;
         roundStart = now;
-        emit RoundStartEvent("A new round of the lottery has started.");
+        emit RoundStartEvent("A new round of the lottery has started.", roundStart);
     }
 
     function closeLottery() public isClosingAllowed {
-        lotteryClosed = true;
+        if (!lotteryClosed) {
+            lotteryClosed = true;
+            emit LotteryClosedEvent("The lottery has been closed.");
+        }
 
         uint endIndex = processedRefunds + batchSize - 1;
         if (endIndex > refundableTicketHolders.length - 1) {
@@ -229,14 +238,14 @@ contract LotteryAda {
         }
 
         if (processedRefunds < refundableTicketHolders.length) {
-            emit UnfinishedBatchProcessingEvent("Not all refunds have been processed, yet. Keep calling the 'closeLottery()' function until all refunds have been processed.");
+            emit UnfinishedBatchProcessingEvent("Not all refunds have been processed, yet. Keep calling the 'closeLottery()' function until all refunds have been processed.", roundStart);
         }
 
         if (refundsByAddress[msg.sender] > 0) {
             uint refundsForCaller = refundsByAddress[msg.sender];
             refundsByAddress[msg.sender] = 0;
             msg.sender.transfer(refundsForCaller);
-            emit PayoutEvent("The lottery was closed without a winner. Already processed refunds have been transfered to your accounts.");
+            emit PayoutEvent("The lottery was closed without a winner. Already processed refunds have been transfered to your accounts.", msg.sender);
         }
     }
 
@@ -250,6 +259,30 @@ contract LotteryAda {
     // Getters
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    function isLotteryClosed() public view returns (bool) {
+        return lotteryClosed;
+    }
+
+    function isForcedRoundEnd() public view returns (bool) {
+        return forcedRoundEnd;
+    }
+
+    function hasDrawingFinished() public view returns (bool) {
+        return drawingFinished;
+    }
+
+    function isWaitingForWinningNumbers() public view returns (bool) {
+        return waitingForWinningNumbers;
+    }
+
+    function isQueryProcessed() public view returns (bool) {
+        return oracle.isQueryProcessed(lastOracleQueryId);
+    }
+
+    function getCurrentParticipants() public view returns (uint) {
+        return currentParticipants;
+    }
+
     function getCurrentRoundStart() public view returns (uint) {
         return roundStart;
     }
@@ -260,14 +293,6 @@ contract LotteryAda {
 
     function getRoundDuration() public view returns (uint) {
         return roundDuration;
-    }
-    
-    function getTimeLeft() public view returns (uint) {
-        if (hasRoundEnded()) {
-            return 0;
-        } else {
-            return now - roundStart - roundDuration;
-        }
     }
 
     function getJackpot() public view returns (uint) {

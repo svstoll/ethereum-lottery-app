@@ -9,23 +9,57 @@
     </div>
   </div>
 
-  <div class="fluid-container bg-primary">
+  <div class="fluid-container bg-primary" [hidden]="false">
     <div class="container status-container">
       <div class="row">
 
-        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12" id="test">
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
           <h2>Jackpot</h2>
-          <h2><b>{{jackpot}} Ξ</b></h2>
-          <button type="button" class="btn btn-secondary" (click)="checkWinnings()">
-            Check Winnings
+          <h2><b>{{jackpot}}</b></h2>
+          <button type="button" class="btn btn-warning" (click)="checkWinnings()">
+            <i class="fas fa-trophy"></i> Check Winnings
           </button>
         </div>
 
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 text-align-right">
           <h2>Time Left</h2>
           <h2><b>{{timeLeftDisplayText}}</b></h2>
-          <button type="button" class="btn btn-secondary" (click)="drawWinningNumbers()">
-            Draw Numbers
+          <button type="button" class="btn btn-warning ng-disabled" (click)="drawWinningNumbers()" [disabled]="isDrawWinningNumbersDisabled()">
+            <i class="fas fa-dice"></i> Draw Numbers
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="fluid-container bg-warning" [hidden]="!showCheckWinningsBanner()">
+    <div class="container winning-numbers-drawn-container">
+      <div class="row">
+
+        <div class="col-12">
+          <h2>Alea iacta est!</h2>
+          <p>
+            The next round will start, once all the winners have been processed.
+            Check your winnings to initiate this process.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="fluid-container bg-danger" [hidden]="!lotteryClosed">
+    <div class="container lottery-closed-container">
+      <div class="row">
+
+        <div class="col-12">
+          <h2>The lottery is permanently closed!</h2>
+          <p>
+            If you bought tickets that did not enter the lottery before it was closed, you will be refunded.
+          </p>
+          <button type="button" class="btn btn-primary" (click)="checkRefunds()">
+            <i class="fas fa-redo"></i> Check Refunds
           </button>
         </div>
 
@@ -53,10 +87,10 @@
           <hr class="lucky-number-rule">
           <div class="d-flex justify-content-between">
             <button (click)="randomPick()" type="button" class="btn btn-primary button-not-last">
-              Random <i class="fas fa-dice"></i>
+              <i class="fas fa-dice"></i> Random
             </button>
-            <button type="button" class="btn btn-primary" (click)="buyTicket()" [disabled]="chosenNumbers.length !== amountToChoose">
-              Buy Ticket <i class="fas fa-ticket-alt"></i>
+            <button type="button" class="btn btn-primary" (click)="buyTicket()" [disabled]="isBuyTicketsButtonDisabled()">
+              <i class="fas fa-ticket-alt"></i> Buy Ticket
             </button>
           </div>
         </div>
