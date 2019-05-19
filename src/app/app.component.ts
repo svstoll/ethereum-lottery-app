@@ -1,6 +1,5 @@
 import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {MetaMaskService} from './metamask.service';
-import {WinninTableEntry} from './class';
 import {Subscription} from 'rxjs';
 import {timer} from 'rxjs';
 

@@ -2,6 +2,8 @@ import {Inject, Injectable} from '@angular/core';
 import {WEB3} from './web3';
 import Web3 from 'web3';
 import {environment} from '../environments/environment';
+import {tick} from '@angular/core/testing';
+import {Ticket} from './class';
 
 @Injectable()
 export class MetaMaskService {
@@ -639,6 +641,7 @@ export class MetaMaskService {
 
   public async drawWinningNumbers() {
     const accounts = await this.web3.eth.getAccounts();
+    console.log(accounts);
     const transactionObj = await this.getTransactionObject(accounts[0], 5000000, 0);
     await this.lotteryContract.methods.drawWinningNumbers().send(transactionObj);
   }
@@ -653,6 +656,11 @@ export class MetaMaskService {
     const accounts = await this.web3.eth.getAccounts();
     const transactionObj = await this.getTransactionObject(accounts[0], 5000000, 0);
     await this.lotteryContract.methods.closeLottery().send(transactionObj);
+  }
+
+  public async getTicketsForAddress() {
+    const accounts = await this.web3.eth.getAccounts();
+    return await this.lotteryContract.methods.getTicketsForAddress(accounts[0]).call();
   }
 
   constructor(@Inject(WEB3) private web3: Web3) {
@@ -674,6 +682,7 @@ export class MetaMaskService {
         this.lotteryContract = await new this.web3.eth.Contract(this.LOTTERY_ABI, environment.privateLotteryAddress);
         break;
     }
+
   }
 
   async getTransactionObject(FROM: string, GAS: number, VALUE: number) {

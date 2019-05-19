@@ -107,36 +107,51 @@
         <div class="col-xl-2 col-lg-2 col-md-0 col-sm-0 col-0"></div>
 
         <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12" id="ticket-check">
-          <hr>
-          <h2>Check The Winners</h2>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vitae turpis a nisl commodo consequat nec id
-            erat. In hac habitasse platea dictumst. In ut ligula eu enim venenatis congue non vel dolor.
-          </p>
-          <table class="table">
-            <thead>
-            <tr>
-              <th>Round</th>
-              <th>Drawing</th>
-              <th>Winners</th>
-              <th>Payout</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let winninTableEntry of winningTable">
-              <td>{{winninTableEntry.round}}</td>
-              <td>{{winninTableEntry.winningNumbers}}</td>
-              <td>{{winninTableEntry.winners}}</td>
-              <td>{{winninTableEntry.payout}}</td>
-            </tr>
-            </tbody>
-          </table>
-          <hr>
-          <div class="d-flex">
-            <button type="button" class="btn btn-primary">
-              Check
-            </button>
+          <h2>My Tickets</h2>
+          <div *ngIf="tickets.length !== 0">
+            <div class="d-flex justify-content-start">
+              <div *ngFor="let ticket of showedTickets" class="ticket">
+                <span class="h5 text-uppercase">Ethereum Lottery Ticket</span>
+                <hr>
+                <p class="font-weight-bolder">My Numbers</p>
+                <div class="d-flex justify-content-between">
+                  <div *ngFor="let n of formateSCNumbersBack(ticket.chosenNumbers)" class="ticket-number-box"
+                       [class.number-box-active]="ticket.winningNumbers.includes(n)">
+                    {{n}}
+                  </div>
+                </div>
+                <hr>
+                <div *ngIf="ticket.winningNumbers">
+                  <p class="font-weight-bolder">Winning Numbers:</p>
+                  <div class="d-flex justify-content-between">
+                    <div *ngFor="let n of formateSCNumbersBack(ticket.winningNumbers)" class="ticket-number-box">
+                      {{n}}
+                    </div>
+                  </div>
+                </div>
+                <p></p>
+                <div *ngIf="!ticket.winningNumbers">
+                  <p>This round has not finished yet!</p>
+                </div>
+                <hr>
+                <p class="font-weight-bolder">Round</p>
+                <p>{{formateDate(ticket.roundStart) | date:'medium'}}</p>
+                <div *ngIf="ticket.won">
+                  <p class="text-uppercase">You have won the lottery!</p>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-center mt-2">
+              <pagination class="custom-pagination"
+                          [totalItems]="tickets.length"
+                          [itemsPerPage]="maxTicketsPerPage"
+                          (pageChanged)="pageChanged($event)"></pagination>
+            </div>
           </div>
+          <div *ngIf="tickets.length === 0">
+            <span class="font-italic">You don't have any tickets yet. Buy your first ticket now!</span>
+          </div>
+
         </div>
 
         <div class="col-xl-2 col-lg-2 col-md-0 col-sm-0 col-0"></div>

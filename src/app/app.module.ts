@@ -8,6 +8,8 @@ import {MetaMaskService} from './metamask.service';
 import {ErrorPageComponent} from './error-page/error-page.component';
 import {LotteryPageComponent} from './lottery-page/lottery-page.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {PaginationModule} from 'ngx-bootstrap';
+import {FormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -19,7 +21,9 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    UiModule
+    UiModule,
+    PaginationModule.forRoot(),
+    FormsModule
   ],
   providers: [MetaMaskService],
   bootstrap: [AppComponent]

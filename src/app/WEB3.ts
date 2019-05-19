@@ -6,6 +6,7 @@ export const WEB3 = new InjectionToken<Web3>('web3', {
   factory: () => {
     const provider = window['ethereum'];
     if (provider) {
+      provider.enable();
       return new Web3(provider);
     } else {
       window.location.href = '/error';

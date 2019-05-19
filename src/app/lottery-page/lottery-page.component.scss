@@ -54,8 +54,8 @@
 }
 
 .number-box-active {
-  background-color: $color-accent;
-  color: black;
+  background-color: $color-accent !important;
+  color: black !important;
 }
 
 .number-box-active:hover {
@@ -82,4 +82,45 @@
 .lucky-number-rule {
   margin-top: 0.4rem;
   margin-bottom: 0.4rem;
+}
+
+.ticket {
+  position: relative;
+  border: 2px solid black;
+  color: black;
+  text-align: center;
+  display: inline-block;
+  padding: 1em 2em;
+  margin-right: 12px;
+  width: 230px;
+}
+.ticket:before,
+.ticket:after{
+  height:90px;
+  width:45px;
+  content: '';
+  position: absolute;
+  top: 0.9em;
+  top: calc(0.9em - 1px);
+  height: 1.2em;
+  width: 0.6em;
+  border: 2px solid black;
+}
+.ticket:before {
+  left: -2px;
+  border-radius: 0 1em 1em 0;
+  border-left-color: $color-light;
+}
+.ticket:after {
+  right: -2px;
+  border-radius: 1em 0 0 1em;
+  border-right-color: $color-light;
+}
+
+.ticket-number-box {
+  background-color: $color-secondary;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 0.4rem;
 }

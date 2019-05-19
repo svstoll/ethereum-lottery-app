@@ -1,7 +1,9 @@
 import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {Subscription, timer} from 'rxjs';
-import {WinninTableEntry} from '../class';
 import {MetaMaskService} from '../metamask.service';
+import {tick} from '@angular/core/testing';
+import {Ticket} from '../class';
+import {PageChangedEvent} from 'ngx-bootstrap';
 
 @Component({
   selector: 'app-lottery-page',
@@ -24,8 +26,11 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
   private waitingForWinningNumbers = false;
   private queryProcessed: boolean;
   private drawingFinished: boolean;
-  private winningTable: WinninTableEntry[] = [];
   private updateSubscrption: Subscription;
+  public tickets: Ticket[] = [];
+  public showedTickets: Ticket[] = [];
+  public maxTicketsPerPage = 3;
+  private currentPage = 1;
 
   constructor(private metaMaskService: MetaMaskService,
               private ngZone: NgZone) {
@@ -59,6 +64,7 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
     this.updateDrawingFinished();
     this.updateQueryProcessed();
     this.updateWaitingForWinningNumbers();
+    this.updateTickets();
     await this.updateJackpot();
     await this.updateTimeLeft();
   }
@@ -74,6 +80,7 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
       this.updateForcedRoundEnd();
       this.updateQueryProcessed();
       this.updateWaitingForWinningNumbers();
+      this.updateTickets();
     }
 
     this.updateTimerDisplayText();
@@ -196,6 +203,18 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
     this.waitingForWinningNumbers = waitingForWinningNumbers;
   }
 
+  public async updateTickets() {
+    const tickets = await this.metaMaskService.getTicketsForAddress();
+    for (const ticket of tickets) {
+      const winningNumbers = await this.metaMaskService.lotteryContract.methods.getWinningNumbersForRoundStart(ticket.roundStart).call();
+      ticket.winningNumbers = winningNumbers;
+      ticket.won = (ticket.winningNumbers === ticket.chosenNumbers);
+    }
+    tickets.reverse();
+    this.tickets = tickets;
+    this.updatePage(this.currentPage);
+  }
+
   public async buyTicket() {
     if (this.amountToChoose !== this.chosenNumbers.length) {
       return;
@@ -255,4 +274,28 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
   private hasRoundEnded(): boolean {
     return this.forcedRoundEnd || this.timeLeft <= 0;
   }
+
+  public pageChanged(event: PageChangedEvent): void {
+    this.currentPage = event.page;
+    this.updatePage(this.currentPage);
+  }
+
+  private updatePage(page: number): void {
+    const startItem = (page - 1) * this.maxTicketsPerPage;
+    const endItem = page * this.maxTicketsPerPage;
+    this.showedTickets = this.tickets.slice(startItem, endItem);
+  }
+
+  public formateSCNumbersBack(scNumber: string): number[] {
+    if (scNumber) {
+      return scNumber.split(':')[1].split(',').map(s => +s.trim());
+    }
+  }
+
+  public formateDate(date: number): Date {
+    const formattedDate = new Date(0);
+    formattedDate.setUTCSeconds(+date.toString());
+    return formattedDate;
+  }
+
 }

@@ -8,8 +8,8 @@ export const environment = {
   mainLotteryAddress: '',
   ropstenOracleAddress: '',
   ropstenLotteryAddress: '',
-  privateOracleAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
-  privateLotteryAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B'
+  privateOracleAddress: '0x1dfe6FD87484816cD18f4C66124daA8B98b987DF',
+  privateLotteryAddress: '0x5446439299672d5124D9c418C891d29E8eDe12Ce'
 };
 
 /*

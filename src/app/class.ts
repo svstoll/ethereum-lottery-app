@@ -1,8 +1,7 @@
-export class WinninTableEntry {
-  round: number;
-  winningNumbers: number[] = [];
-  winners: string[] = [];
-  payout: number;
+export class Ticket {
+  chosenNumbers: string;
+  winningNumbers: string;
+  ticketOwner: string;
+  roundStart: number;
+  won: boolean;
 }
-
-
