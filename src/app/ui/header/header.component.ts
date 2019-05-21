@@ -10,7 +10,8 @@ export class HeaderComponent implements OnInit {
   @Input()
   network: string;
 
-  constructor() { }
+  constructor() {
+  }
 
   async ngOnInit() {
   }

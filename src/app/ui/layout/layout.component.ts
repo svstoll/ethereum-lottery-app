@@ -10,7 +10,8 @@ export class LayoutComponent implements OnInit {
   @Input()
   network: string;
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
   }

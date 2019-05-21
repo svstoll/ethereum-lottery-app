@@ -1,8 +1,7 @@
 import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {Subscription, timer} from 'rxjs';
 import {MetaMaskService} from '../metamask.service';
-import {tick} from '@angular/core/testing';
-import {Ticket} from '../class';
+import {Ticket} from '../ticket';
 import {PageChangedEvent} from 'ngx-bootstrap';
 
 @Component({
@@ -13,6 +12,8 @@ import {PageChangedEvent} from 'ngx-bootstrap';
 export class LotteryPageComponent implements OnInit, OnDestroy {
   public networkName: string;
 
+  private initializing = true;
+  private currentAccount = null;
   private lotteryNumbers: number[] = [];
   private chosenNumbers: number[] = [];
   private amountOfNumbers = 24;
@@ -26,7 +27,7 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
   private waitingForWinningNumbers = false;
   private queryProcessed: boolean;
   private drawingFinished: boolean;
-  private updateSubscrption: Subscription;
+  private updateSubscription: Subscription;
   public tickets: Ticket[] = [];
   public showedTickets: Ticket[] = [];
   public maxTicketsPerPage = 3;
@@ -43,14 +44,14 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
     this.startEventListening();
 
     this.ngZone.run(() => {
-      this.updateSubscrption = timer(1, 1000).subscribe(x =>  {
+      this.updateSubscription = timer(1, 1000).subscribe(x =>  {
         this.updateLottery(x);
       });
     });
   }
 
   ngOnDestroy(): void {
-    this.updateSubscrption.unsubscribe();
+    this.updateSubscription.unsubscribe();
   }
 
   private async initLottery() {
@@ -67,11 +68,13 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
     this.updateTickets();
     await this.updateJackpot();
     await this.updateTimeLeft();
+    this.currentAccount = await this.metaMaskService.getCurrentAccount();
+    this.initializing = false;
   }
 
   private updateLottery(tick: number) {
     this.timeLeft = this.timeLeft - 1;
-    if (tick % 10 === 0) {
+    if (tick % 5 === 0) {
       this.updateTimeLeft();
       this.updateJackpot();
       this.updateCurrentParticipants();
@@ -81,6 +84,7 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
       this.updateQueryProcessed();
       this.updateWaitingForWinningNumbers();
       this.updateTickets();
+      this.currentAccount = this.metaMaskService.getCurrentAccount();
     }
 
     this.updateTimerDisplayText();
@@ -88,6 +92,8 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
 
   private startEventListening() {
     // TODO: Replace alerts with modal windows.
+    // All events from both contracts are duplicated for some reason whenever a new listener is registered.
+    // Therefore, we only register once until the bug is fixed in web3.js.
     this.metaMaskService.lotteryContract.events.allEvents({
       fromBlock: 'latest'
     }, (error, event) => {
@@ -110,28 +116,14 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
         case 'DrawingFinishedEvent':
           this.updateLottery(0);
           break;
-        case 'PayoutEvent':
-          // TODO: Differentiate between winnings and refunds.
-          // TODO: Filter for sender account payouts.
-          alert('Congratulations, you have won in the lottery. Your winnings have been transferred to your account.');
+        case 'WinnerEvent':
+          if (event.returnValues._to && event.returnValues._to === '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1') {
+            alert('Congratulations, you have won in the lottery. Your winnings have been transferred to your account.');
+          }
           break;
         case 'RoundStartEvent':
           this.updateLottery(0);
           break;
-      }
-    });
-
-    // TODO: All events from both contracts are duplicated for some reason whenever a new listener is registered.
-    //       Only register to one contract?
-    this.metaMaskService.oracleContract.events.allEvents({
-      fromBlock: 'latest'
-    }, (error, event) => {
-      if (error) {
-        console.error('Error while waiting for oracle contract events.');
-        return;
-      }
-      console.log('Oracle contract event arrived.', event);
-      switch (event.event) {
         case 'QueryFinishedEvent':
           this.updateLottery(0);
           break;
@@ -140,12 +132,16 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
   }
 
   private updateTimerDisplayText() {
-    if (this.lotteryClosed || this.timeLeft <= 0 || this.forcedRoundEnd) {
-      this.timeLeftDisplayText = 'Round has ended';
+    if (this.lotteryClosed) {
+      this.timeLeftDisplayText = 'The lottery is closed.';
       return;
     }
 
     let time: number = this.timeLeft;
+    if (this.timeLeft <= 0 || this.forcedRoundEnd) {
+      time = 0;
+    }
+
     const days = Math.floor(time / 86400);
     time -= days * 86400;
     const hours = Math.floor(time / 3600) % 24;
@@ -228,18 +224,18 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
     await this.updateJackpot();
   }
 
-  public async checkRefunds() {
-    await this.metaMaskService.closeLottery();
+  public async distributeRefunds() {
+    await this.metaMaskService.distributeRefunds();
   }
 
-  // Select a number on the grid
+  // Select a number on the grid.
   public mutateLotteryNumber(lotteryNumber: number): void {
     (this.chosenNumbers.includes(lotteryNumber)) ?
       this.chosenNumbers = this.chosenNumbers.filter((n) => n !== lotteryNumber) :
       (this.chosenNumbers.length < this.amountToChoose) && this.chosenNumbers.push(lotteryNumber);
   }
 
-  // select randomly the numbers on the grid
+  // Randomly select the numbers on the grid.
   public randomPick(): void {
     this.chosenNumbers = [];
     while (this.chosenNumbers.length !== this.amountToChoose) {
@@ -254,16 +250,16 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
     await this.metaMaskService.drawWinningNumbers();
   }
 
-  public async checkWinnings() {
-    await this.metaMaskService.checkWinnings();
+  public async distributeWinnings() {
+    await this.metaMaskService.distributeWinnings();
   }
 
-  public isDrawWinningNumbersDisabled(): boolean {
-    return this.lotteryClosed || !this.hasRoundEnded() || this.waitingForWinningNumbers || this.drawingFinished;
+  public showDrawWinningNumbersBanner(): boolean {
+    return !this.initializing && !this.lotteryClosed && this.hasRoundEnded() && !(this.waitingForWinningNumbers || this.drawingFinished);
   }
 
-  public showCheckWinningsBanner(): boolean {
-    return !this.lotteryClosed && this.hasRoundEnded() &&
+  public showDistributeWinningsBanner(): boolean {
+    return !this.initializing && !this.lotteryClosed && this.hasRoundEnded() &&
       (this.drawingFinished || (this.currentParticipants > 0 && this.waitingForWinningNumbers && this.queryProcessed));
   }
 
@@ -286,16 +282,15 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
     this.showedTickets = this.tickets.slice(startItem, endItem);
   }
 
-  public formateSCNumbersBack(scNumber: string): number[] {
-    if (scNumber) {
-      return scNumber.split(':')[1].split(',').map(s => +s.trim());
+  public formatSCNumbersBack(scNumbers: string): number[] {
+    if (scNumbers) {
+      return scNumbers.split(':')[1].split(',').map(s => +s.trim());
     }
   }
 
-  public formateDate(date: number): Date {
+  public formatDate(date: number): Date {
     const formattedDate = new Date(0);
     formattedDate.setUTCSeconds(+date.toString());
     return formattedDate;
   }
-
 }

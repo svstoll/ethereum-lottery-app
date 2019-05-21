@@ -1,7 +1,4 @@
-import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
-import {MetaMaskService} from './metamask.service';
-import {Subscription} from 'rxjs';
-import {timer} from 'rxjs';
+import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -10,8 +7,9 @@ import {timer} from 'rxjs';
 })
 export class AppComponent implements OnInit {
 
-    constructor() {}
+  constructor() {
+  }
 
-    ngOnInit(): void {
-    }
+  ngOnInit(): void {
+  }
 }

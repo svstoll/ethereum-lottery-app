@@ -16,15 +16,27 @@
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
           <h2>Jackpot</h2>
           <h2><b>{{jackpot}}</b></h2>
-          <button type="button" class="btn btn-warning" (click)="checkWinnings()">
-            <i class="fas fa-trophy"></i> Check Winnings
-          </button>
         </div>
 
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 text-align-right">
           <h2>Time Left</h2>
           <h2><b>{{timeLeftDisplayText}}</b></h2>
-          <button type="button" class="btn btn-warning ng-disabled" (click)="drawWinningNumbers()" [disabled]="isDrawWinningNumbersDisabled()">
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="fluid-container bg-warning" *ngIf="showDrawWinningNumbersBanner()">
+    <div class="container draw-winning-numbers-container">
+      <div class="row">
+
+        <div class="col-12">
+          <h2>The round has ended!</h2>
+          <p>
+            Draw the winning numbers so that the winners can be decided.
+          </p>
+          <button type="button" class="btn btn-primary ng-disabled" (click)="drawWinningNumbers()">
             <i class="fas fa-dice"></i> Draw Numbers
           </button>
         </div>
@@ -33,16 +45,18 @@
     </div>
   </div>
 
-  <div class="fluid-container bg-warning" [hidden]="!showCheckWinningsBanner()">
-    <div class="container winning-numbers-drawn-container">
+  <div class="fluid-container bg-warning" *ngIf="showDistributeWinningsBanner()">
+    <div class="container distribute-winnings-container">
       <div class="row">
 
         <div class="col-12">
           <h2>Alea iacta est!</h2>
           <p>
-            The next round will start, once all the winners have been processed.
-            Check your winnings to initiate this process.
+            The next round will start once all winnings have been distributed.
           </p>
+          <button type="button" class="btn btn-primary" (click)="distributeWinnings()">
+            <i class="fas fa-trophy"></i> Distribute Winnings
+          </button>
         </div>
 
       </div>
@@ -58,7 +72,7 @@
           <p>
             If you bought tickets that did not enter the lottery before it was closed, you will be refunded.
           </p>
-          <button type="button" class="btn btn-primary" (click)="checkRefunds()">
+          <button type="button" class="btn btn-primary" (click)="distributeRefunds()">
             <i class="fas fa-redo"></i> Check Refunds
           </button>
         </div>
@@ -75,7 +89,7 @@
 
         <div class="col-xl-4 col-lg-4 col-md-6 col-sm-8 col-10" id="participate">
           <h2>Participate in Round</h2>
-          <p>You must choose exactly four numbers.</p>
+          <p>You must choose exactly four numbers. The price for a ticket is 1 ETH.</p>
           <div class="lottery-number-container">
             <div *ngFor="let lotteryNumber of lotteryNumbers; let i=index">
               <div [class.number-box-active]="chosenNumbers.includes(lotteryNumber)"
@@ -107,25 +121,25 @@
         <div class="col-xl-2 col-lg-2 col-md-0 col-sm-0 col-0"></div>
 
         <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12" id="ticket-check">
-          <h2>My Tickets</h2>
+          <h2>Your Tickets</h2>
           <div *ngIf="tickets.length !== 0">
             <div class="d-flex justify-content-start">
               <div *ngFor="let ticket of showedTickets" class="ticket">
                 <span class="h5 text-uppercase">Ethereum Lottery Ticket</span>
                 <hr>
-                <p class="font-weight-bolder">My Numbers</p>
+                <p class="font-weight-bolder">Chosen Numbers</p>
                 <div class="d-flex justify-content-between">
-                  <div *ngFor="let n of formateSCNumbersBack(ticket.chosenNumbers)" class="ticket-number-box"
+                  <div *ngFor="let n of formatSCNumbersBack(ticket.chosenNumbers)" class="ticket-number-box"
                        [class.number-box-active]="ticket.winningNumbers.includes(n)">
-                    {{n}}
+                    <div>{{n}}</div>
                   </div>
                 </div>
                 <hr>
                 <div *ngIf="ticket.winningNumbers">
                   <p class="font-weight-bolder">Winning Numbers:</p>
                   <div class="d-flex justify-content-between">
-                    <div *ngFor="let n of formateSCNumbersBack(ticket.winningNumbers)" class="ticket-number-box">
-                      {{n}}
+                    <div *ngFor="let n of formatSCNumbersBack(ticket.winningNumbers)" class="ticket-number-box">
+                      <div>{{n}}</div>
                     </div>
                   </div>
                 </div>
@@ -134,10 +148,10 @@
                   <p>This round has not finished yet!</p>
                 </div>
                 <hr>
-                <p class="font-weight-bolder">Round</p>
-                <p>{{formateDate(ticket.roundStart) | date:'medium'}}</p>
+                <p class="font-weight-bolder">Round Start</p>
+                <p>{{formatDate(ticket.roundStart) | date:'dd.MM.yy, hh:mm:ss'}}</p>
                 <div *ngIf="ticket.won">
-                  <p class="text-uppercase">You have won the lottery!</p>
+                  <p><b>Winning Ticket</b></p>
                 </div>
               </div>
             </div>
@@ -149,7 +163,7 @@
             </div>
           </div>
           <div *ngIf="tickets.length === 0">
-            <span class="font-italic">You don't have any tickets yet. Buy your first ticket now!</span>
+            <span>You don't have any tickets yet. Buy your first ticket now!</span>
           </div>
 
         </div>
@@ -167,10 +181,7 @@
         <div class="col-12" id="about">
           <h1>About</h1>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vitae turpis a nisl commodo consequat nec id
-            erat. In hac habitasse platea dictumst. In ut ligula eu enim venenatis congue non vel dolor. Cras vitae
-            efficitur sapien. Pellentesque gravida metus mauris, vel placerat ex tincidunt sed. Curabitur quis egestas ex.
-            Suspendisse tincidunt eleifend interdum.
+            This decentralized lottery DApp was created by Fan Feng, Yuang Cheng, Sven Stoll and Roger Staubli.
           </p>
         </div>
 

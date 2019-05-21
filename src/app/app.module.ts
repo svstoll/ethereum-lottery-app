@@ -28,4 +28,5 @@ import {FormsModule} from '@angular/forms';
   providers: [MetaMaskService],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

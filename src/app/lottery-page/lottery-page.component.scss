@@ -8,13 +8,17 @@
 .title-container {
   padding-top: 5rem;
   padding-bottom: 5rem;
+  color: $color-text-light;
 }
 
 .status-container {
   color: $color-text-light;
 }
 
-.winning-numbers-drawn-container {
+.distribute-winnings-container {
+}
+
+.draw-winning-numbers-container {
 }
 
 .lottery-closed-container {
@@ -27,6 +31,7 @@
 .about-container {
   padding-top: 5rem;
   padding-bottom: 5rem;
+  color: $color-text-light;
 }
 
 .lottery-number-container {
@@ -40,7 +45,7 @@
   cursor: pointer;
   float: left;
   background-color: $color-secondary;
-  color: white;
+  color: $color-text-light;
   width: calc(16.66% - 0.4rem);
   padding-bottom: calc(16.66% - 0.4rem);
   margin-right: 0.4rem;
@@ -59,7 +64,7 @@
 }
 
 .number-box-active:hover {
-  background-color: #d9b600;
+  background-color: #d9b600 !important;
 }
 
 .lucky-number-box-active {
@@ -86,7 +91,7 @@
 
 .ticket {
   position: relative;
-  border: 2px solid black;
+  border: 2px solid black;;
   color: black;
   text-align: center;
   display: inline-block;
@@ -94,10 +99,9 @@
   margin-right: 12px;
   width: 230px;
 }
+
 .ticket:before,
-.ticket:after{
-  height:90px;
-  width:45px;
+.ticket:after {
   content: '';
   position: absolute;
   top: 0.9em;
@@ -106,11 +110,13 @@
   width: 0.6em;
   border: 2px solid black;
 }
+
 .ticket:before {
   left: -2px;
   border-radius: 0 1em 1em 0;
   border-left-color: $color-light;
 }
+
 .ticket:after {
   right: -2px;
   border-radius: 1em 0 0 1em;
@@ -118,9 +124,13 @@
 }
 
 .ticket-number-box {
+  float: left;
   background-color: $color-secondary;
-  color: white;
-  width: 30px;
-  height: 30px;
+  color: $color-text-light;
+  width: calc(25% - 0.4rem);
+  height: auto;
+  margin-right: 0.4rem;
+  margin-bottom: 0.4rem;
+  position: relative;
   border-radius: 0.4rem;
 }
