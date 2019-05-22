@@ -130,7 +130,7 @@
                 <p class="font-weight-bolder">Chosen Numbers</p>
                 <div class="d-flex justify-content-between">
                   <div *ngFor="let n of formatSCNumbersBack(ticket.chosenNumbers)" class="ticket-number-box"
-                       [class.number-box-active]="ticket.winningNumbers.includes(n)">
+                       [class.number-box-active]="formatSCNumbersBack(ticket.winningNumbers).indexOf(n) > -1">
                     <div>{{n}}</div>
                   </div>
                 </div>
