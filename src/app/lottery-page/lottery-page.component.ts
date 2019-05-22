@@ -19,6 +19,7 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
   private chosenNumbers: number[] = [];
   private amountOfNumbers = 24;
   private amountToChoose = 4;
+  private ticketPrice = 1;
   private jackpot = 'Updating';
   private timeLeft = 0;
   private timeLeftDisplayText = 'Updating';
@@ -69,6 +70,7 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
     this.updateQueryProcessed();
     this.updateWaitingForWinningNumbers();
     this.updateTickets();
+    this.updateTicketPrice();
     await this.updateJackpot();
     await this.updateTimeLeft();
     this.currentAccount = await this.metaMaskService.getCurrentAccount();
@@ -172,7 +174,7 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
 
   public async updateJackpot() {
     const jackpot = await this.metaMaskService.lotteryContract.methods.getJackpot().call();
-    this.jackpot = (+jackpot.toString() / Math.pow(10, 18)) + ' Ξ';
+    this.jackpot = (+jackpot.toString() / Math.pow(10, 18)) + ' ETH';
   }
 
   public async updateTimeLeft() {
@@ -184,6 +186,11 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
   public async updateCurrentParticipants() {
     const currentParticipants = await this.metaMaskService.lotteryContract.methods.getCurrentParticipants().call();
     this.currentParticipants = +currentParticipants.toString();
+  }
+
+  public async updateTicketPrice() {
+    const ticketPrice = await this.metaMaskService.lotteryContract.methods.getTicketPrice().call();
+    this.ticketPrice = ticketPrice / 1e18;
   }
 
   public async updateLotteryClosed() {

@@ -222,243 +222,6 @@ export class MetaMaskService {
 
   LOTTERY_ABI: any = [
     {
-      constant: true,
-      inputs: [],
-      name: 'isQueryProcessed',
-      outputs: [
-        {
-          name: '',
-          type: 'bool'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
-      constant: true,
-      inputs: [],
-      name: 'isWaitingForWinningNumbers',
-      outputs: [
-        {
-          name: '',
-          type: 'bool'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
-      constant: true,
-      inputs: [],
-      name: 'getCurrentRoundStart',
-      outputs: [
-        {
-          name: '',
-          type: 'uint256'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
-      constant: true,
-      inputs: [],
-      name: 'isForcedRoundEnd',
-      outputs: [
-        {
-          name: '',
-          type: 'bool'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
-      constant: false,
-      inputs: [],
-      name: 'drawWinningNumbers',
-      outputs: [],
-      payable: false,
-      stateMutability: 'nonpayable',
-      type: 'function'
-    },
-    {
-      constant: false,
-      inputs: [],
-      name: 'retrieveLeftOvers',
-      outputs: [],
-      payable: false,
-      stateMutability: 'nonpayable',
-      type: 'function'
-    },
-    {
-      constant: false,
-      inputs: [],
-      name: 'closeLottery',
-      outputs: [],
-      payable: false,
-      stateMutability: 'nonpayable',
-      type: 'function'
-    },
-    {
-      constant: true,
-      inputs: [],
-      name: 'getCurrentRoundEnd',
-      outputs: [
-        {
-          name: '',
-          type: 'uint256'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
-      constant: false,
-      inputs: [],
-      name: 'endRound',
-      outputs: [],
-      payable: false,
-      stateMutability: 'nonpayable',
-      type: 'function'
-    },
-    {
-      constant: true,
-      inputs: [],
-      name: 'hasDrawingFinished',
-      outputs: [
-        {
-          name: '',
-          type: 'bool'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
-      constant: false,
-      inputs: [],
-      name: 'distributeWinnings',
-      outputs: [],
-      payable: false,
-      stateMutability: 'nonpayable',
-      type: 'function'
-    },
-    {
-      constant: true,
-      inputs: [],
-      name: 'getRoundDuration',
-      outputs: [
-        {
-          name: '',
-          type: 'uint256'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
-      constant: true,
-      inputs: [],
-      name: 'getJackpot',
-      outputs: [
-        {
-          name: '',
-          type: 'uint256'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
-      constant: true,
-      inputs: [
-        {
-          name: '_roundStart',
-          type: 'uint256'
-        }
-      ],
-      name: 'getWinningNumbersForRoundStart',
-      outputs: [
-        {
-          name: '',
-          type: 'string'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
-      constant: true,
-      inputs: [],
-      name: 'isLotteryClosed',
-      outputs: [
-        {
-          name: '',
-          type: 'bool'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
-      constant: true,
-      inputs: [
-        {
-          name: '_account',
-          type: 'address'
-        }
-      ],
-      name: 'getTicketsForAddress',
-      outputs: [
-        {
-          components: [
-            {
-              name: 'chosenNumbers',
-              type: 'string'
-            },
-            {
-              name: 'roundStart',
-              type: 'uint256'
-            },
-            {
-              name: 'ticketOwner',
-              type: 'address'
-            }
-          ],
-          name: '',
-          type: 'tuple[]'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
-      constant: true,
-      inputs: [],
-      name: 'getCurrentParticipants',
-      outputs: [
-        {
-          name: '',
-          type: 'uint256'
-        }
-      ],
-      payable: false,
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
       constant: false,
       inputs: [
         {
@@ -467,29 +230,6 @@ export class MetaMaskService {
         }
       ],
       name: 'adjustOracleFee',
-      outputs: [],
-      payable: false,
-      stateMutability: 'nonpayable',
-      type: 'function'
-    },
-    {
-      constant: false,
-      inputs: [
-        {
-          name: '_newOwner',
-          type: 'address'
-        }
-      ],
-      name: 'transferOwnership',
-      outputs: [],
-      payable: false,
-      stateMutability: 'nonpayable',
-      type: 'function'
-    },
-    {
-      constant: false,
-      inputs: [],
-      name: 'distributeRefunds',
       outputs: [],
       payable: false,
       stateMutability: 'nonpayable',
@@ -510,28 +250,49 @@ export class MetaMaskService {
       type: 'function'
     },
     {
-      inputs: [
-        {
-          name: '_oracleAddress',
-          type: 'address'
-        },
-        {
-          name: '_price',
-          type: 'uint256'
-        },
-        {
-          name: '_roundDuration',
-          type: 'uint256'
-        }
-      ],
-      payable: true,
-      stateMutability: 'payable',
-      type: 'constructor'
+      constant: false,
+      inputs: [],
+      name: 'closeLottery',
+      outputs: [],
+      payable: false,
+      stateMutability: 'nonpayable',
+      type: 'function'
     },
     {
-      payable: true,
-      stateMutability: 'payable',
-      type: 'fallback'
+      constant: false,
+      inputs: [],
+      name: 'distributeRefunds',
+      outputs: [],
+      payable: false,
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      constant: false,
+      inputs: [],
+      name: 'distributeWinnings',
+      outputs: [],
+      payable: false,
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      constant: false,
+      inputs: [],
+      name: 'drawWinningNumbers',
+      outputs: [],
+      payable: false,
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      constant: false,
+      inputs: [],
+      name: 'endRound',
+      outputs: [],
+      payable: false,
+      stateMutability: 'nonpayable',
+      type: 'function'
     },
     {
       anonymous: false,
@@ -544,6 +305,15 @@ export class MetaMaskService {
       ],
       name: 'LotteryClosedEvent',
       type: 'event'
+    },
+    {
+      constant: false,
+      inputs: [],
+      name: 'retrieveLeftOvers',
+      outputs: [],
+      payable: false,
+      stateMutability: 'nonpayable',
+      type: 'function'
     },
     {
       anonymous: false,
@@ -595,6 +365,20 @@ export class MetaMaskService {
       ],
       name: 'DrawingFinishedEvent',
       type: 'event'
+    },
+    {
+      constant: false,
+      inputs: [
+        {
+          name: '_newOwner',
+          type: 'address'
+        }
+      ],
+      name: 'transferOwnership',
+      outputs: [],
+      payable: false,
+      stateMutability: 'nonpayable',
+      type: 'function'
     },
     {
       anonymous: false,
@@ -663,12 +447,261 @@ export class MetaMaskService {
       ],
       name: 'ForcedRoundEndEvent',
       type: 'event'
+    },
+    {
+      payable: true,
+      stateMutability: 'payable',
+      type: 'fallback'
+    },
+    {
+      inputs: [
+        {
+          name: '_oracleAddress',
+          type: 'address'
+        },
+        {
+          name: '_roundDuration',
+          type: 'uint256'
+        }
+      ],
+      payable: true,
+      stateMutability: 'payable',
+      type: 'constructor'
+    },
+    {
+      constant: true,
+      inputs: [],
+      name: 'getCurrentParticipants',
+      outputs: [
+        {
+          name: '',
+          type: 'uint256'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [],
+      name: 'getCurrentRoundEnd',
+      outputs: [
+        {
+          name: '',
+          type: 'uint256'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [],
+      name: 'getCurrentRoundStart',
+      outputs: [
+        {
+          name: '',
+          type: 'uint256'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [],
+      name: 'getJackpot',
+      outputs: [
+        {
+          name: '',
+          type: 'uint256'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [],
+      name: 'getRoundDuration',
+      outputs: [
+        {
+          name: '',
+          type: 'uint256'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [],
+      name: 'getTicketPrice',
+      outputs: [
+        {
+          name: '',
+          type: 'uint256'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [
+        {
+          name: '_account',
+          type: 'address'
+        }
+      ],
+      name: 'getTicketsForAddress',
+      outputs: [
+        {
+          components: [
+            {
+              name: 'chosenNumbers',
+              type: 'string'
+            },
+            {
+              name: 'roundStart',
+              type: 'uint256'
+            },
+            {
+              name: 'ticketOwner',
+              type: 'address'
+            }
+          ],
+          name: '',
+          type: 'tuple[]'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [
+        {
+          name: '_roundStart',
+          type: 'uint256'
+        }
+      ],
+      name: 'getWinningNumbersForRoundStart',
+      outputs: [
+        {
+          name: '',
+          type: 'string'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [],
+      name: 'hasDrawingFinished',
+      outputs: [
+        {
+          name: '',
+          type: 'bool'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [],
+      name: 'isForcedRoundEnd',
+      outputs: [
+        {
+          name: '',
+          type: 'bool'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [],
+      name: 'isLotteryClosed',
+      outputs: [
+        {
+          name: '',
+          type: 'bool'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [],
+      name: 'isQueryProcessed',
+      outputs: [
+        {
+          name: '',
+          type: 'bool'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      constant: true,
+      inputs: [],
+      name: 'isWaitingForWinningNumbers',
+      outputs: [
+        {
+          name: '',
+          type: 'bool'
+        }
+      ],
+      payable: false,
+      stateMutability: 'view',
+      type: 'functcion'
     }
   ];
 
   public currentNetwork: string;
   public oracleContract: any;
   public lotteryContract: any;
+  public ticketPrice = 1;
+
+  constructor(@Inject(WEB3) private web3: Web3) {
+  }
+
+  async init() {
+    this.currentNetwork = await this.web3.eth.net.getNetworkType();
+    switch (this.currentNetwork) {
+      case 'main':
+        this.oracleContract = await new this.web3.eth.Contract(this.ORACLE_ABI, environment.mainOracleAddress);
+        this.lotteryContract = await new this.web3.eth.Contract(this.LOTTERY_ABI, environment.mainLotteryAddress);
+        break;
+      case 'ropsten':
+        this.oracleContract = await new this.web3.eth.Contract(this.ORACLE_ABI, environment.ropstenOracleAddress);
+        this.lotteryContract = await new this.web3.eth.Contract(this.LOTTERY_ABI, environment.ropstenLotteryAddress);
+        break;
+      case 'private':
+        this.oracleContract = await new this.web3.eth.Contract(this.ORACLE_ABI, environment.privateOracleAddress);
+        this.lotteryContract = await new this.web3.eth.Contract(this.LOTTERY_ABI, environment.privateLotteryAddress);
+        break;
+    }
+    this.ticketPrice = await this.lotteryContract.methods.getTicketPrice().call();
+  }
 
   public async getCurrentAccount() {
     const accounts = await this.web3.eth.getAccounts();
@@ -677,7 +710,7 @@ export class MetaMaskService {
 
   public async buyTicket(numbers: string) {
     const account = await this.getCurrentAccount();
-    const transactionObj = await this.getTransactionObject(account, 5000000, 1e18);
+    const transactionObj = await this.getTransactionObject(account, 5000000, this.ticketPrice);
     await this.lotteryContract.methods.buyTicket(numbers).send(transactionObj);
   }
 
@@ -702,27 +735,6 @@ export class MetaMaskService {
   public async getTicketsForAddress() {
     const account = await this.getCurrentAccount();
     return await this.lotteryContract.methods.getTicketsForAddress(account).call();
-  }
-
-  constructor(@Inject(WEB3) private web3: Web3) {
-  }
-
-  async init() {
-    this.currentNetwork = await this.web3.eth.net.getNetworkType();
-    switch (this.currentNetwork) {
-      case 'main':
-        this.oracleContract = await new this.web3.eth.Contract(this.ORACLE_ABI, environment.mainOracleAddress);
-        this.lotteryContract = await new this.web3.eth.Contract(this.LOTTERY_ABI, environment.mainLotteryAddress);
-        break;
-      case 'ropsten':
-        this.oracleContract = await new this.web3.eth.Contract(this.ORACLE_ABI, environment.ropstenOracleAddress);
-        this.lotteryContract = await new this.web3.eth.Contract(this.LOTTERY_ABI, environment.ropstenLotteryAddress);
-        break;
-      case 'private':
-        this.oracleContract = await new this.web3.eth.Contract(this.ORACLE_ABI, environment.privateOracleAddress);
-        this.lotteryContract = await new this.web3.eth.Contract(this.LOTTERY_ABI, environment.privateLotteryAddress);
-        break;
-    }
   }
 
   async getTransactionObject(FROM: string, GAS: number, VALUE: number) {
