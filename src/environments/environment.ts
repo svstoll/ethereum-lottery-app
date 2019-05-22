@@ -7,7 +7,7 @@ export const environment = {
   mainOracleAddress: '',
   mainLotteryAddress: '',
   ropstenOracleAddress: '0x709fd3fde463513a36b9e04e70d4b766a7d54bf7',
-  ropstenLotteryAddress: '0x700b6d08db8d65c7b415d57cc2310f6a37e6840b',
+  ropstenLotteryAddress: '0x48ee47bd9085f441a5127ff883100733452ce53f',
   privateOracleAddress: '0xCfEB869F69431e42cdB54A4F4f105C19C080A601',
   privateLotteryAddress: '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B'
 };
