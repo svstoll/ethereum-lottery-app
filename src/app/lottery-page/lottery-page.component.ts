@@ -14,7 +14,7 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
   public networkName: string;
 
   private initializing = true;
-  private currentAccount = null;
+  private currentAccount: string = null;
   private lotteryNumbers: number[] = [];
   private chosenNumbers: number[] = [];
   private amountOfNumbers = 24;
@@ -46,7 +46,6 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
     await this.initLottery();
     this.startEventListening();
 
-
     this.ngZone.run(() => {
       this.updateSubscription = timer(1, 1000).subscribe(x =>  {
         this.updateLottery(x);
@@ -73,13 +72,14 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
     this.updateTicketPrice();
     await this.updateJackpot();
     await this.updateTimeLeft();
-    this.currentAccount = await this.metaMaskService.getCurrentAccount();
+    await this.updateCurrentAccount();
     this.initializing = false;
   }
 
-  private updateLottery(tick: number) {
+  private async updateLottery(tick: number) {
     this.timeLeft = this.timeLeft - 1;
     if (tick % 5 === 0) {
+      this.updateCurrentAccount();
       this.updateTimeLeft();
       this.updateJackpot();
       this.updateCurrentParticipants();
@@ -89,7 +89,6 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
       this.updateQueryProcessed();
       this.updateWaitingForWinningNumbers();
       this.updateTickets();
-      this.currentAccount = this.metaMaskService.getCurrentAccount();
     }
 
     this.updateTimerDisplayText();
@@ -120,7 +119,7 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
           this.updateLottery(0);
           break;
         case 'WinnerEvent':
-          if (event.returnValues._to && event.returnValues._to === '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1') {
+          if (event.returnValues._to && event.returnValues._to === this.currentAccount) {
             this.showLotteryWonMessage();
           }
           break;
@@ -170,6 +169,10 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
       minutes + 'm',
       seconds + 's'
     ].join(' ');
+  }
+
+  public async updateCurrentAccount() {
+    this.currentAccount = await this.metaMaskService.getCurrentAccount();
   }
 
   public async updateJackpot() {
