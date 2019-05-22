@@ -3,6 +3,7 @@ import {Subscription, timer} from 'rxjs';
 import {MetaMaskService} from '../metamask.service';
 import {Ticket} from '../ticket';
 import {PageChangedEvent} from 'ngx-bootstrap';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-lottery-page',
@@ -34,6 +35,7 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
   private currentPage = 1;
 
   constructor(private metaMaskService: MetaMaskService,
+              private toastr: ToastrService,
               private ngZone: NgZone) {
   }
 
@@ -42,6 +44,7 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
     this.networkName = this.metaMaskService.currentNetwork;
     await this.initLottery();
     this.startEventListening();
+
 
     this.ngZone.run(() => {
       this.updateSubscription = timer(1, 1000).subscribe(x =>  {
@@ -91,7 +94,6 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
   }
 
   private startEventListening() {
-    // TODO: Replace alerts with modal windows.
     // All events from both contracts are duplicated for some reason whenever a new listener is registered.
     // Therefore, we only register once until the bug is fixed in web3.js.
     this.metaMaskService.lotteryContract.events.allEvents({
@@ -110,15 +112,14 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
           this.forcedRoundEnd = true;
           break;
         case 'ProvideOracleFeeEvent':
-          alert('The winning numbers could not be drawn because the oracle fee could not be paid for. ' +
-            'Someone must send some funds to the oracle contract.');
+          this.showOracleFeeError();
           break;
         case 'DrawingFinishedEvent':
           this.updateLottery(0);
           break;
         case 'WinnerEvent':
           if (event.returnValues._to && event.returnValues._to === '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1') {
-            alert('Congratulations, you have won in the lottery. Your winnings have been transferred to your account.');
+            this.showLotteryWonMessage();
           }
           break;
         case 'RoundStartEvent':
@@ -129,6 +130,17 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
           break;
       }
     });
+  }
+
+  private showLotteryWonMessage() {
+    const message = 'Your winnings have been transferred to your account.';
+    this.toastr.success(message, 'Lottery won!', {timeOut: 0});
+  }
+
+  private showOracleFeeError() {
+    const message = 'The winning numbers could not be drawn because the oracle fee could not be paid for. ' +
+      'Someone must send some funds to the oracle contract.';
+    this.toastr.error(message, 'Oracle fee not covered.', {timeOut: 0});
   }
 
   private updateTimerDisplayText() {
@@ -219,9 +231,7 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
     const stringifiedNumbers = this.chosenNumbers
       .sort((n1, n2) => n1 - n2)
       .join(', ');
-    await this.metaMaskService.buyTicket('Set 1: ' + stringifiedNumbers);
-    this.chosenNumbers = [];
-    await this.updateJackpot();
+    this.metaMaskService.buyTicket('Set 1: ' + stringifiedNumbers);
   }
 
   public async distributeRefunds() {

@@ -10,12 +10,13 @@ import {LotteryPageComponent} from './lottery-page/lottery-page.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {PaginationModule} from 'ngx-bootstrap';
 import {FormsModule} from '@angular/forms';
+import {ToastrModule} from 'ngx-toastr';
 
 @NgModule({
   declarations: [
     AppComponent,
     ErrorPageComponent,
-    LotteryPageComponent
+    LotteryPageComponent,
   ],
   imports: [
     BrowserModule,
@@ -23,7 +24,8 @@ import {FormsModule} from '@angular/forms';
     AppRoutingModule,
     UiModule,
     PaginationModule.forRoot(),
-    FormsModule
+    FormsModule,
+    ToastrModule.forRoot()
   ],
   providers: [MetaMaskService],
   bootstrap: [AppComponent]

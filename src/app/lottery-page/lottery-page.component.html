@@ -149,12 +149,13 @@
                 </div>
                 <hr>
                 <p class="font-weight-bolder">Round Start</p>
-                <p>{{formatDate(ticket.roundStart) | date:'dd.MM.yy, hh:mm:ss'}}</p>
+                <p>{{formatDate(ticket.roundStart) | date:'dd.MM.yy, HH:mm:ss'}}</p>
                 <div *ngIf="ticket.won">
                   <p><b>Winning Ticket</b></p>
                 </div>
               </div>
             </div>
+            <hr>
             <div class="d-flex justify-content-center mt-2">
               <pagination class="custom-pagination"
                           [totalItems]="tickets.length"
@@ -165,7 +166,6 @@
           <div *ngIf="tickets.length === 0">
             <span>You don't have any tickets yet. Buy your first ticket now!</span>
           </div>
-
         </div>
 
         <div class="col-xl-2 col-lg-2 col-md-0 col-sm-0 col-0"></div>
@@ -181,7 +181,7 @@
         <div class="col-12" id="about">
           <h1>About</h1>
           <p>
-            This decentralized lottery DApp was created by Fan Feng, Yuang Cheng, Sven Stoll and Roger Staubli.
+            This lottery DApp was created by Fan Feng, Yuang Cheng, Sven Stoll and Roger Staubli.
           </p>
         </div>
 

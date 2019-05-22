@@ -670,7 +670,7 @@ export class MetaMaskService {
   public oracleContract: any;
   public lotteryContract: any;
 
-  public async getCurrentAccount(): string {
+  public async getCurrentAccount() {
     const accounts = await this.web3.eth.getAccounts();
     return accounts[0];
   }
