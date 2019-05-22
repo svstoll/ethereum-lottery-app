@@ -305,6 +305,8 @@ export class LotteryPageComponent implements OnInit, OnDestroy {
   public formatSCNumbersBack(scNumbers: string): number[] {
     if (scNumbers) {
       return scNumbers.split(':')[1].split(',').map(s => +s.trim());
+    } else {
+      return [];
     }
   }
 
