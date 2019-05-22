@@ -46,4 +46,4 @@ testem.log
 Thumbs.db
 
 # Truffle
-/contracts/build
+/ethereum/build

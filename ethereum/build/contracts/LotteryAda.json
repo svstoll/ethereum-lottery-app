@@ -390,29 +390,10 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "_account",
-          "type": "address"
-        }
-      ],
+      "inputs": [],
       "name": "getJackpot",
       "outputs": [
         {
-          "components": [
-            {
-              "name": "chosenNumbers",
-              "type": "string"
-            },
-            {
-              "name": "roundStart",
-              "type": "uint256"
-            },
-            {
-              "name": "ticketOwner",
-              "type": "address"
-            }
-          ],
           "name": "",
           "type": "uint256"
         }
@@ -432,8 +413,6 @@
       "name": "getTicketsForAddress",
       "outputs": [
         {
-          "name": "",
-          "type": "tuple[]",
           "components": [
             {
               "name": "chosenNumbers",
@@ -447,7 +426,9 @@
               "name": "ticketOwner",
               "type": "address"
             }
-          ]
+          ],
+          "name": "",
+          "type": "tuple[]"
         }
       ],
       "payable": false,
@@ -11341,46 +11322,16 @@
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "baseExpression": {
-                      "argumentTypes": null,
-                      "id": 884,
-                      "name": "ticketsByAddress",
-                      "nodeType": "Identifier",
-                      "overloadedDeclarations": [],
-                      "referencedDeclaration": 103,
-                      "src": "11306:16:0",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_struct$_Ticket_$10_storage_$dyn_storage_$",
-                        "typeString": "mapping(address => struct LotteryAda.Ticket storage ref[] storage ref)"
-                      }
-                    },
                     "id": 881,
-                    "indexExpression": {
-                      "argumentTypes": null,
-                      "id": 885,
-                      "name": "_account",
-                      "nodeType": "Identifier",
-                      "overloadedDeclarations": [],
-                      "referencedDeclaration": 878,
-                      "src": "11323:8:0",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_address",
-                        "typeString": "address"
-                      }
-                    },
-                    "isConstant": false,
-                    "isLValue": true,
-                    "isPure": false,
-                    "lValueRequested": false,
+                    "name": "jackpot",
                     "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 79,
                     "src": "11271:7:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
-                    },
-                    "name": "jackpot",
-                    "overloadedDeclarations": [],
-                    "referencedDeclaration": 79
+                    }
                   },
                   "functionReturnParameters": 880,
                   "id": 882,
@@ -11399,35 +11350,7 @@
             "parameters": {
               "id": 877,
               "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 878,
-                  "name": "_account",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 889,
-                  "src": "11232:16:0",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_address",
-                    "typeString": "address"
-                  },
-                  "typeName": {
-                    "id": 877,
-                    "name": "address",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "11232:7:0",
-                    "stateMutability": "nonpayable",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_address",
-                      "typeString": "address"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
+              "parameters": [],
               "src": "11223:2:0"
             },
             "returnParameters": {
@@ -11448,27 +11371,14 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "baseType": {
-                      "contractScope": null,
-                      "id": 880,
-                      "name": "Ticket",
-                      "nodeType": "UserDefinedTypeName",
-                      "referencedDeclaration": 10,
-                      "src": "11271:6:0",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_Ticket_$10_storage_ptr",
-                        "typeString": "struct LotteryAda.Ticket"
-                      }
-                    },
                     "id": 878,
-                    "length": null,
+                    "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "11247:4:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
-                    },
-                    "name": "uint"
+                    }
                   },
                   "value": null,
                   "visibility": "internal"
@@ -11565,11 +11475,11 @@
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "11324:7:0",
+                    "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
-                    },
-                    "stateMutability": "nonpayable"
+                    }
                   },
                   "value": null,
                   "visibility": "internal"
@@ -11595,14 +11505,6 @@
                     "typeString": "struct LotteryAda.Ticket[]"
                   },
                   "typeName": {
-                    "id": 889,
-                    "name": "string",
-                    "nodeType": "ArrayTypeName",
-                    "src": "11363:8:0",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_struct$_Ticket_$10_storage_$dyn_storage_ptr",
-                      "typeString": "struct LotteryAda.Ticket[]"
-                    },
                     "baseType": {
                       "contractScope": null,
                       "id": 888,
@@ -11615,7 +11517,14 @@
                         "typeString": "struct LotteryAda.Ticket"
                       }
                     },
-                    "length": null
+                    "id": 889,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "11363:8:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_struct$_Ticket_$10_storage_$dyn_storage_ptr",
+                      "typeString": "struct LotteryAda.Ticket[]"
+                    }
                   },
                   "value": null,
                   "visibility": "internal"
@@ -22629,46 +22538,16 @@
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "baseExpression": {
-                      "argumentTypes": null,
-                      "id": 884,
-                      "name": "ticketsByAddress",
-                      "nodeType": "Identifier",
-                      "overloadedDeclarations": [],
-                      "referencedDeclaration": 103,
-                      "src": "11306:16:0",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_mapping$_t_address_$_t_array$_t_struct$_Ticket_$10_storage_$dyn_storage_$",
-                        "typeString": "mapping(address => struct LotteryAda.Ticket storage ref[] storage ref)"
-                      }
-                    },
                     "id": 881,
-                    "indexExpression": {
-                      "argumentTypes": null,
-                      "id": 885,
-                      "name": "_account",
-                      "nodeType": "Identifier",
-                      "overloadedDeclarations": [],
-                      "referencedDeclaration": 878,
-                      "src": "11323:8:0",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_address",
-                        "typeString": "address"
-                      }
-                    },
-                    "isConstant": false,
-                    "isLValue": true,
-                    "isPure": false,
-                    "lValueRequested": false,
+                    "name": "jackpot",
                     "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 79,
                     "src": "11271:7:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
-                    },
-                    "name": "jackpot",
-                    "overloadedDeclarations": [],
-                    "referencedDeclaration": 79
+                    }
                   },
                   "functionReturnParameters": 880,
                   "id": 882,
@@ -22687,35 +22566,7 @@
             "parameters": {
               "id": 877,
               "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 878,
-                  "name": "_account",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 889,
-                  "src": "11232:16:0",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_address",
-                    "typeString": "address"
-                  },
-                  "typeName": {
-                    "id": 877,
-                    "name": "address",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "11232:7:0",
-                    "stateMutability": "nonpayable",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_address",
-                      "typeString": "address"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
+              "parameters": [],
               "src": "11223:2:0"
             },
             "returnParameters": {
@@ -22736,27 +22587,14 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "baseType": {
-                      "contractScope": null,
-                      "id": 880,
-                      "name": "Ticket",
-                      "nodeType": "UserDefinedTypeName",
-                      "referencedDeclaration": 10,
-                      "src": "11271:6:0",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_Ticket_$10_storage_ptr",
-                        "typeString": "struct LotteryAda.Ticket"
-                      }
-                    },
                     "id": 878,
-                    "length": null,
+                    "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "11247:4:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
-                    },
-                    "name": "uint"
+                    }
                   },
                   "value": null,
                   "visibility": "internal"
@@ -22853,11 +22691,11 @@
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "11324:7:0",
+                    "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
-                    },
-                    "stateMutability": "nonpayable"
+                    }
                   },
                   "value": null,
                   "visibility": "internal"
@@ -22883,14 +22721,6 @@
                     "typeString": "struct LotteryAda.Ticket[]"
                   },
                   "typeName": {
-                    "id": 889,
-                    "name": "string",
-                    "nodeType": "ArrayTypeName",
-                    "src": "11363:8:0",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_array$_t_struct$_Ticket_$10_storage_$dyn_storage_ptr",
-                      "typeString": "struct LotteryAda.Ticket[]"
-                    },
                     "baseType": {
                       "contractScope": null,
                       "id": 888,
@@ -22903,7 +22733,14 @@
                         "typeString": "struct LotteryAda.Ticket"
                       }
                     },
-                    "length": null
+                    "id": 889,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "11363:8:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_struct$_Ticket_$10_storage_$dyn_storage_ptr",
+                      "typeString": "struct LotteryAda.Ticket[]"
+                    }
                   },
                   "value": null,
                   "visibility": "internal"
@@ -23062,25 +22899,7 @@
     "version": "0.5.0+commit.1d4f565a.Emscripten.clang"
   },
   "networks": {
-    "1558463343163": {
-      "events": {},
-      "links": {},
-      "address": "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B",
-      "transactionHash": "0x70552063035e0fae321ece3b1abb73f7f18e6ba8385ac65ff57d9a66b08f9d28"
-    },
-    "1558539044076": {
-      "events": {},
-      "links": {},
-      "address": "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B",
-      "transactionHash": "0x70552063035e0fae321ece3b1abb73f7f18e6ba8385ac65ff57d9a66b08f9d28"
-    },
-    "1558545230814": {
-      "events": {},
-      "links": {},
-      "address": "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B",
-      "transactionHash": "0xad361a50e58113572bda1814ab87d776178ed61a60223a515a7a082381e00c34"
-    },
-    "1558546615508": {
+    "1558547050956": {
       "events": {},
       "links": {},
       "address": "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B",
@@ -23088,7 +22907,7 @@
     }
   },
   "schemaVersion": "3.0.9",
-  "updatedAt": "2019-05-22T17:38:23.927Z",
+  "updatedAt": "2019-05-22T17:45:43.070Z",
   "devdoc": {
     "methods": {}
   },
